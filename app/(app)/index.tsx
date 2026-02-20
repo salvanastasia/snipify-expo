@@ -97,7 +97,9 @@ export default function HomeScreen() {
 
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>Your Snippets</Text>
-            <LyricSnippets key={`snippets-${refreshKey}`} />
+            <View style={styles.snippetsSwiperWrapper}>
+              <LyricSnippets key={`snippets-${refreshKey}`} />
+            </View>
           </View>
 
           <View style={styles.section}>
@@ -147,6 +149,7 @@ const styles = StyleSheet.create({
   profileSetupBtnText: { fontSize: 15, fontWeight: "600" },
   profileLabel: { fontSize: 12 },
   section: { paddingHorizontal: 24, marginTop: 24 },
+  snippetsSwiperWrapper: { marginHorizontal: -24 },
   sectionTitle: {
     fontSize: 28,
     fontWeight: "700",

@@ -14,7 +14,7 @@ import { supabase } from "@/lib/supabase";
 import { getLyricSnippetsByUserId, LyricSnippet, updateSnippetColor } from "@/lib/storage";
 import { getColorsFromImageUrl } from "@/lib/albumArtColors";
 import { useAuth } from "@/lib/auth-context";
-import { SnippetCard } from "@/components/SnippetCard";
+import { SnippetGridCard, SNIPPET_GRID_CARD_GAP } from "@/components/SnippetGridCard";
 
 interface Profile {
   id: string;
@@ -192,13 +192,25 @@ export default function UserProfileScreen() {
           )}
         </View>
 
-        {/* Snippets */}
+        {/* Snippets (grid by default for public profile) */}
         <Text style={styles.sectionTitle}>
           {snippets.length} {snippets.length === 1 ? "Snippet" : "Snippets"}
         </Text>
-        {snippets.map((snippet) => (
-          <SnippetCard key={snippet.id} snippet={snippet} readOnly />
-        ))}
+        <View style={styles.snippetsGrid}>
+          {(() => {
+            const rows: LyricSnippet[][] = [];
+            for (let i = 0; i < snippets.length; i += 2) {
+              rows.push(snippets.slice(i, i + 2));
+            }
+            return rows.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.snippetsGridRow}>
+                {row.map((snippet) => (
+                  <SnippetGridCard key={snippet.id} snippet={snippet} readOnly />
+                ))}
+              </View>
+            ));
+          })()}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -207,7 +219,7 @@ export default function UserProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#121212" },
   backButton: { padding: 16 },
-  content: { paddingHorizontal: 16, paddingBottom: 40 },
+  content: { paddingHorizontal: 24, paddingBottom: 40 },
   profileHeader: { alignItems: "center", gap: 8, marginBottom: 24 },
   avatar: { width: 120, height: 120, borderRadius: 60 },
   avatarPlaceholder: {
@@ -232,6 +244,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "700",
     marginBottom: 16,
+  },
+  snippetsGrid: { gap: SNIPPET_GRID_CARD_GAP },
+  snippetsGridRow: {
+    flexDirection: "row",
+    gap: SNIPPET_GRID_CARD_GAP,
+    marginBottom: SNIPPET_GRID_CARD_GAP,
   },
   // Ghost skeleton
   ghostAvatar: { backgroundColor: "rgba(255,255,255,0.06)" },
