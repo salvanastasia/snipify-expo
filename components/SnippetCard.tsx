@@ -47,15 +47,15 @@ export function SnippetCard({ snippet, readOnly = false, onDelete }: Props) {
         <View style={[styles.cardGradient, { backgroundColor: bgColorDark }]} />
 
         <View style={styles.cardContent}>
-          {/* Album art */}
-          {snippet.album_art_url && (
-            <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
-          )}
-
-          {/* Lyrics */}
-          <Text style={styles.lyrics} numberOfLines={4}>
-            {snippet.lyrics}
-          </Text>
+          <View style={styles.topRow}>
+            <Text style={styles.lyrics} numberOfLines={4}>
+              {snippet.lyrics}
+            </Text>
+            {/* Circular album art (top right) */}
+            {snippet.album_art_url && (
+              <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
+            )}
+          </View>
 
           {/* Footer */}
           <View style={styles.footer}>
@@ -100,26 +100,31 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: "50%",
-    opacity: 0.6,
+    height: "45%",
+    opacity: 0.4,
   },
   cardContent: {
     padding: 20,
     gap: 12,
     flex: 1,
   },
+  topRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    flex: 1,
+  },
   albumArt: {
-    width: 48,
-    height: 48,
-    borderRadius: 6,
-    alignSelf: "flex-end",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
   },
   lyrics: {
+    flex: 1,
     color: "rgba(255,255,255,0.95)",
     fontSize: 18,
     fontWeight: "500",
     lineHeight: 28,
-    flex: 1,
   },
   footer: {
     flexDirection: "row",

@@ -15,6 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { saveLyricSnippet } from "@/lib/storage";
+import { getColorsFromImageUrl } from "@/lib/albumArtColors";
 import { LyricsBottomSheet } from "./LyricsBottomSheet";
 
 const RECENT_SEARCHES_KEY = "recent-searches";
@@ -142,7 +143,8 @@ export function SearchBar({ onSnippetSaved }: Props) {
     albumArt: string;
     lyrics: string;
   }) => {
-    await saveLyricSnippet(snippet.songTitle, snippet.artist, snippet.albumArt, snippet.lyrics, null);
+    const color = await getColorsFromImageUrl(snippet.albumArt || null);
+    await saveLyricSnippet(snippet.songTitle, snippet.artist, snippet.albumArt, snippet.lyrics, color);
     onSnippetSaved();
   };
 
