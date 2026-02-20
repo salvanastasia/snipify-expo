@@ -10,6 +10,8 @@ import {
   ActivityIndicator,
   Keyboard,
   Platform,
+  Animated,
+  Dimensions,
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -58,6 +60,11 @@ export function SearchBar({ onSnippetSaved }: Props) {
   const [lyricsOpen, setLyricsOpen] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  
+  // Animated values for smooth transitions
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const searchBarBottom = useRef(new Animated.Value(0)).current;
+  const screenHeight = Dimensions.get('window').height;
 
   useEffect(() => {
     AsyncStorage.getItem(RECENT_SEARCHES_KEY).then((val) => {
@@ -68,10 +75,44 @@ export function SearchBar({ onSnippetSaved }: Props) {
   useEffect(() => {
     const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
     const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-    const showSub = Keyboard.addListener(showEvent, (e) =>
-      setKeyboardHeight(e.endCoordinates.height)
-    );
-    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0));
+    
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      const height = e.endCoordinates.height;
+      setKeyboardHeight(height);
+      
+      // Animate overlay fade-in
+      Animated.timing(overlayOpacity, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+      
+      // Animate search bar slide-up (4px above keyboard)
+      Animated.timing(searchBarBottom, {
+        toValue: height + 4,
+        duration: Platform.OS === 'ios' ? 250 : 300,
+        useNativeDriver: false, // bottom position requires layout animation
+      }).start();
+    });
+    
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardHeight(0);
+      
+      // Animate overlay fade-out
+      Animated.timing(overlayOpacity, {
+        toValue: 0,
+        duration: 250,
+        useNativeDriver: true,
+      }).start();
+      
+      // Animate search bar slide-down
+      Animated.timing(searchBarBottom, {
+        toValue: 0,
+        duration: Platform.OS === 'ios' ? 250 : 300,
+        useNativeDriver: false,
+      }).start();
+    });
+    
     return () => {
       showSub.remove();
       hideSub.remove();
@@ -185,16 +226,21 @@ export function SearchBar({ onSnippetSaved }: Props) {
         pointerEvents="none"
         style={[
           styles.gradientContainer,
-          {
-            bottom: keyboardHeight,
-            height: isKeyboardOpen
-              ? OVERLAY_HEIGHT_KEYBOARD_OPEN + bottomInset
-              : STRIP_HEIGHT_CLOSED + 56 + bottomInset,
-          },
+          isKeyboardOpen
+            ? {
+                top: 0,
+                bottom: keyboardHeight,
+              }
+            : {
+                bottom: 0,
+                height: STRIP_HEIGHT_CLOSED + 56 + bottomInset,
+              },
         ]}
       >
         {isKeyboardOpen && (
-          <BlurView intensity={BLUR_INTENSITY} tint="dark" style={StyleSheet.absoluteFill} />
+          <Animated.View style={[StyleSheet.absoluteFill, { opacity: overlayOpacity }]}>
+            <BlurView intensity={BLUR_INTENSITY} tint="dark" style={StyleSheet.absoluteFill} />
+          </Animated.View>
         )}
         <LinearGradient
           colors={[
@@ -211,11 +257,11 @@ export function SearchBar({ onSnippetSaved }: Props) {
         />
       </View>
       {/* Fixed at bottom: from bottom = keyboard, then search bar, then results */}
-      <View
+      <Animated.View
         style={[
           styles.wrapper,
           {
-            bottom: keyboardHeight,
+            bottom: searchBarBottom, // Animated value: keyboardHeight + 4
             paddingBottom: bottomInset,
           },
         ]}
@@ -278,7 +324,7 @@ export function SearchBar({ onSnippetSaved }: Props) {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
+      </Animated.View>
 
       {/* Backdrop to close */}
       {isOpen && (
@@ -333,7 +379,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    zIndex: 100,
+    zIndex: 1000,
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 0,
