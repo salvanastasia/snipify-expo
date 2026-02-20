@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { saveLyricSnippet } from "@/lib/storage";
 import { getColorsFromImageUrl } from "@/lib/albumArtColors";
@@ -37,6 +38,7 @@ interface Props {
 
 export function SearchBar({ onSnippetSaved }: Props) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [recentSearches, setRecentSearches] = useState<any[]>([]);
@@ -153,8 +155,8 @@ export function SearchBar({ onSnippetSaved }: Props) {
 
   return (
     <>
-      {/* Fixed search bar at top */}
-      <View style={styles.wrapper}>
+      {/* Fixed search bar at bottom */}
+      <View style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom, 8) }]}>
         <View style={styles.inputRow}>
           <Ionicons name="search" size={18} color="rgba(255,255,255,0.5)" style={styles.searchIcon} />
           <TextInput
@@ -178,7 +180,7 @@ export function SearchBar({ onSnippetSaved }: Props) {
           </TouchableOpacity>
         </View>
 
-        {/* Dropdown results */}
+        {/* Dropdown results (opens upward) */}
         {isOpen && (
           <View style={styles.dropdown}>
             {loading ? (
@@ -250,13 +252,13 @@ function SongRow({ song, onPress }: { song: any; onPress: () => void }) {
 const styles = StyleSheet.create({
   wrapper: {
     position: "absolute",
-    top: 0,
+    bottom: 0,
     left: 0,
     right: 0,
     zIndex: 100,
     paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
+    paddingTop: 8,
+    paddingBottom: 0,
   },
   inputRow: {
     flexDirection: "row",
@@ -283,8 +285,10 @@ const styles = StyleSheet.create({
   dropdown: {
     backgroundColor: "#282828",
     borderRadius: 16,
-    marginTop: 8,
+    marginBottom: 8,
     overflow: "hidden",
+    maxHeight: 400,
+    transform: [{ translateY: 0 }],
   },
   songRow: {
     flexDirection: "row",

@@ -30,8 +30,7 @@ export default function HomeScreen() {
   if (!user) return null;
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <SearchBar onSnippetSaved={() => setRefreshKey((k) => k + 1)} />
+    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -68,6 +67,7 @@ export default function HomeScreen() {
           <TopArtists key={`artists-${refreshKey}`} />
         </View>
       </ScrollView>
+      <SearchBar onSnippetSaved={() => setRefreshKey((k) => k + 1)} />
     </SafeAreaView>
   );
 }
@@ -75,7 +75,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#121212" },
   scroll: { flex: 1 },
-  scrollContent: { paddingTop: 80, paddingBottom: 40 },
+  scrollContent: { paddingTop: 16, paddingBottom: 80 },
   profileHeader: {
     flexDirection: "row",
     alignItems: "flex-start",
