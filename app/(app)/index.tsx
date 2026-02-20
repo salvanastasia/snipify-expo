@@ -7,7 +7,8 @@ import {
   RefreshControl,
   TouchableOpacity,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/lib/auth-context";
 import { SearchBar } from "@/components/SearchBar";
 import { LyricSnippets } from "@/components/LyricSnippets";
@@ -16,8 +17,11 @@ import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { ProfileName } from "@/components/ProfileName";
 import { ProfileStats } from "@/components/ProfileStats";
 
+const TOP_GRADIENT_HEIGHT = 64;
+
 export default function HomeScreen() {
   const { user, signOut } = useAuth();
+  const insets = useSafeAreaInsets();
   const [refreshKey, setRefreshKey] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -30,7 +34,27 @@ export default function HomeScreen() {
   if (!user) return null;
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "bottom"]}>
+    <View style={styles.container}>
+      {/* Gradient dalla cima (dietro status bar): #121212 → trasparente verso il basso */}
+      <View
+        pointerEvents="none"
+        style={[styles.topGradient, { height: insets.top + TOP_GRADIENT_HEIGHT }]}
+      >
+        <LinearGradient
+          colors={[
+            "#121212",
+            "rgba(18, 18, 18, 0.6)",
+            "rgba(18, 18, 18, 0.25)",
+            "rgba(18, 18, 18, 0)",
+            "rgba(18, 18, 18, 0)",
+          ]}
+          locations={[0, 0.12, 0.28, 0.5, 1]}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+        />
+      </View>
+      <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -68,12 +92,22 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
       <SearchBar onSnippetSaved={() => setRefreshKey((k) => k + 1)} />
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#121212" },
+  safeArea: { flex: 1, backgroundColor: "transparent" },
+  topGradient: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 98,
+    overflow: "hidden",
+  },
   scroll: { flex: 1 },
   scrollContent: { paddingTop: 16, paddingBottom: 80 },
   profileHeader: {

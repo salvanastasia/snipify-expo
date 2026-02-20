@@ -31,6 +31,18 @@
     "experiments": {
       "typedRoutes": true
     },
-    "newArchEnabled": true
+    "newArchEnabled": true,
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "1c170475-b9f0-4451-885b-de9bbd67d163"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/1c170475-b9f0-4451-885b-de9bbd67d163"
+    }
   }
 }
