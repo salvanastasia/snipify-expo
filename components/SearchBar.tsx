@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     right: 0,
-    zIndex: 99,
+    zIndex: 999,
     overflow: "hidden",
   },
   inputRowWrapper: {

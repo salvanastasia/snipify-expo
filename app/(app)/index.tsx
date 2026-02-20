@@ -6,6 +6,7 @@ import {
   StyleSheet,
   RefreshControl,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -54,11 +55,13 @@ export default function HomeScreen() {
           end={{ x: 0.5, y: 1 }}
         />
       </View>
-      <SafeAreaView style={styles.safeArea} edges={["top", "bottom"]}>
+      <SafeAreaView style={styles.safeArea} edges={[]}>
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        contentInsetAdjustmentBehavior="never"
+        automaticallyAdjustContentInsets={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -105,11 +108,11 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    zIndex: 98,
+    zIndex: 999,
     overflow: "hidden",
   },
-  scroll: { flex: 1 },
-  scrollContent: { paddingTop: 16, paddingBottom: 80 },
+  scroll: { flex: 1, backgroundColor: "#121212" },
+  scrollContent: { paddingTop: 0, paddingBottom: 80 },
   profileHeader: {
     flexDirection: "row",
     alignItems: "flex-start",

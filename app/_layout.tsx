@@ -32,7 +32,7 @@ function RootLayoutNav() {
 export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#121212" }}>
-      <StatusBar style="light" backgroundColor="#121212" />
+      <StatusBar style="light" />
       <AuthProvider>
         <RootLayoutNav />
       </AuthProvider>
