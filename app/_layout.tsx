@@ -2,10 +2,13 @@ import { useEffect } from "react";
 import { View } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
 import { ThemeProvider, useTheme } from "@/lib/theme-context";
+
+SplashScreen.preventAutoHideAsync();
 
 const DOTO_FONT = require("@/assets/fonts/Doto-VariableFont_ROND,wght.ttf");
 
@@ -52,7 +55,16 @@ function ThemeRoot() {
 }
 
 export default function RootLayout() {
-  useFonts({ Doto: DOTO_FONT });
+  const [fontsLoaded] = useFonts({ Doto: DOTO_FONT });
+
+  useEffect(() => {
+    if (fontsLoaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
+
   return (
     <ThemeProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
