@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { supabase } from "@/lib/supabase";
+import { useTheme } from "@/lib/theme-context";
 import { FollowersFollowingSheet } from "./FollowersFollowingSheet";
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function ProfileStats({ userId }: Props) {
+  const { colors } = useTheme();
   const [snippetCount, setSnippetCount] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
@@ -45,16 +47,18 @@ export function ProfileStats({ userId }: Props) {
   return (
     <>
       <View style={styles.container}>
-        <Stat label="Snippets" value={snippetCount} />
+        <Stat label="Snippets" value={snippetCount} colors={colors} />
         <Stat
           label="Followers"
           value={followersCount}
           onPress={() => setListModal({ open: true, type: "followers" })}
+          colors={colors}
         />
         <Stat
           label="Following"
           value={followingCount}
           onPress={() => setListModal({ open: true, type: "following" })}
+          colors={colors}
         />
       </View>
       {listModal.type && (
@@ -73,15 +77,17 @@ function Stat({
   label,
   value,
   onPress,
+  colors,
 }: {
   label: string;
   value: number;
   onPress?: () => void;
+  colors: { text: string; textMuted: string };
 }) {
   const content = (
     <View style={styles.stat}>
-      <Text style={styles.value}>{value}</Text>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.value, { color: colors.text }]}>{value}</Text>
+      <Text style={[styles.label, { color: colors.textMuted }]}>{label}</Text>
     </View>
   );
 
@@ -99,6 +105,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   stat: { alignItems: "flex-start" },
-  value: { color: "#fff", fontSize: 16, fontWeight: "700" },
-  label: { color: "rgba(255,255,255,0.6)", fontSize: 12 },
+  value: { fontSize: 16, fontWeight: "700" },
+  label: { fontSize: 12 },
 });

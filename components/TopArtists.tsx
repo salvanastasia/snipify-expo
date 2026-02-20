@@ -10,8 +10,8 @@ import {
   FlatList,
   ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { getLyricSnippets } from "@/lib/storage";
+import { useTheme } from "@/lib/theme-context";
 
 interface Artist {
   name: string;
@@ -20,6 +20,7 @@ interface Artist {
 }
 
 export function TopArtists() {
+  const { colors } = useTheme();
   const [artists, setArtists] = useState<Artist[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
@@ -53,8 +54,8 @@ export function TopArtists() {
   if (loading) {
     return (
       <View>
-        <Text style={styles.title}>Top artists</Text>
-        <ActivityIndicator color="#fff" style={{ marginTop: 16 }} />
+        <Text style={[styles.title, { color: colors.text }]}>Top artists</Text>
+        <ActivityIndicator color={colors.tint} style={{ marginTop: 16 }} />
       </View>
     );
   }
@@ -62,8 +63,8 @@ export function TopArtists() {
   if (artists.length === 0) {
     return (
       <View>
-        <Text style={styles.title}>Top artists</Text>
-        <Text style={styles.emptyText}>Save some lyrics to see your top artists!</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Top artists</Text>
+        <Text style={[styles.emptyText, { color: colors.textMuted }]}>Save some lyrics to see your top artists!</Text>
       </View>
     );
   }
@@ -71,9 +72,9 @@ export function TopArtists() {
   return (
     <View>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>Top artists</Text>
-        <TouchableOpacity onPress={() => setShowAll(true)}>
-          <Text style={styles.showAll}>Show all</Text>
+        <Text style={[styles.title, { color: colors.text }]}>Top artists</Text>
+        <TouchableOpacity onPress={() => setShowAll(true)} accessibilityLabel="Show all artists" accessibilityRole="button">
+          <Text style={[styles.showAll, { color: colors.textMuted }]}>Show all</Text>
         </TouchableOpacity>
       </View>
 
@@ -83,17 +84,16 @@ export function TopArtists() {
         contentContainerStyle={styles.scrollContent}
       >
         {artists.slice(0, 10).map((artist) => (
-          <ArtistItem key={artist.name} artist={artist} />
+          <ArtistItem key={artist.name} artist={artist} colors={colors} />
         ))}
       </ScrollView>
 
-      {/* Show all modal */}
       <Modal visible={showAll} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowAll(false)}>
-        <View style={styles.modal}>
-          <View style={styles.modalHeader}>
+        <View style={[styles.modal, { backgroundColor: colors.card }]}>
+          <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
             <View>
-              <Text style={styles.modalTitle}>All Artists</Text>
-              <Text style={styles.modalSubtitle}>{artists.length} artists</Text>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>All Artists</Text>
+              <Text style={[styles.modalSubtitle, { color: colors.textMuted }]}>{artists.length} artists</Text>
             </View>
           </View>
 
@@ -105,11 +105,11 @@ export function TopArtists() {
               <View style={styles.modalRow}>
                 <Image
                   source={{ uri: item.imageUrl || undefined }}
-                  style={styles.modalAvatar}
+                  style={[styles.modalAvatar, { backgroundColor: colors.input }]}
                 />
                 <View style={styles.modalInfo}>
-                  <Text style={styles.modalArtistName}>{item.name}</Text>
-                  <Text style={styles.modalArtistCount}>
+                  <Text style={[styles.modalArtistName, { color: colors.text }]}>{item.name}</Text>
+                  <Text style={[styles.modalArtistCount, { color: colors.textMuted }]}>
                     {item.count} {item.count === 1 ? "snippet" : "snippets"}
                   </Text>
                 </View>
@@ -117,8 +117,8 @@ export function TopArtists() {
             )}
           />
 
-          <View style={styles.modalFooter}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setShowAll(false)}>
+          <View style={[styles.modalFooter, { borderTopColor: colors.border }]}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setShowAll(false)} accessibilityLabel="Close" accessibilityRole="button">
               <Text style={styles.closeText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -128,12 +128,12 @@ export function TopArtists() {
   );
 }
 
-function ArtistItem({ artist }: { artist: Artist }) {
+function ArtistItem({ artist, colors }: { artist: Artist; colors: { text: string; textMuted: string; input: string } }) {
   return (
     <View style={styles.artistItem}>
-      <Image source={{ uri: artist.imageUrl || undefined }} style={styles.artistImage} />
-      <Text style={styles.artistName} numberOfLines={1}>{artist.name}</Text>
-      <Text style={styles.artistCount}>
+      <Image source={{ uri: artist.imageUrl || undefined }} style={[styles.artistImage, { backgroundColor: colors.input }]} />
+      <Text style={[styles.artistName, { color: colors.text }]} numberOfLines={1}>{artist.name}</Text>
+      <Text style={[styles.artistCount, { color: colors.textMuted }]}>
         {artist.count} {artist.count === 1 ? "snippet" : "snippets"}
       </Text>
     </View>
@@ -141,23 +141,19 @@ function ArtistItem({ artist }: { artist: Artist }) {
 }
 
 const styles = StyleSheet.create({
-  title: { color: "#fff", fontSize: 28, fontWeight: "700", marginBottom: 16 },
+  title: { fontSize: 28, fontWeight: "700", marginBottom: 16 },
   headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 },
-  showAll: { color: "rgba(255,255,255,0.6)", fontSize: 14 },
-  emptyText: { color: "rgba(255,255,255,0.5)", fontSize: 15 },
+  showAll: { fontSize: 14 },
+  emptyText: { fontSize: 15 },
   scrollContent: { gap: 20, paddingRight: 16 },
   artistItem: { alignItems: "center", width: 120, gap: 8 },
-  artistImage: { width: 120, height: 120, borderRadius: 60, backgroundColor: "#282828" },
-  artistName: { color: "#fff", fontSize: 14, fontWeight: "600", textAlign: "center" },
-  artistCount: { color: "rgba(255,255,255,0.5)", fontSize: 12, textAlign: "center" },
-  modal: { flex: 1, backgroundColor: "#282828" },
-  modalHeader: {
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.1)",
-  },
-  modalTitle: { color: "#fff", fontSize: 20, fontWeight: "600" },
-  modalSubtitle: { color: "rgba(255,255,255,0.6)", fontSize: 14, marginTop: 2 },
+  artistImage: { width: 120, height: 120, borderRadius: 60 },
+  artistName: { fontSize: 14, fontWeight: "600", textAlign: "center" },
+  artistCount: { fontSize: 12, textAlign: "center" },
+  modal: { flex: 1 },
+  modalHeader: { padding: 20, borderBottomWidth: 1 },
+  modalTitle: { fontSize: 20, fontWeight: "600" },
+  modalSubtitle: { fontSize: 14, marginTop: 2 },
   modalList: { padding: 16, gap: 4 },
   modalRow: {
     flexDirection: "row",
@@ -166,15 +162,11 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 12,
   },
-  modalAvatar: { width: 56, height: 56, borderRadius: 28, backgroundColor: "#383838" },
+  modalAvatar: { width: 56, height: 56, borderRadius: 28 },
   modalInfo: { flex: 1 },
-  modalArtistName: { color: "#fff", fontSize: 16, fontWeight: "600" },
-  modalArtistCount: { color: "rgba(255,255,255,0.5)", fontSize: 13, marginTop: 2 },
-  modalFooter: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(255,255,255,0.1)",
-  },
+  modalArtistName: { fontSize: 16, fontWeight: "600" },
+  modalArtistCount: { fontSize: 13, marginTop: 2 },
+  modalFooter: { padding: 16, borderTopWidth: 1 },
   closeButton: {
     backgroundColor: "#fff",
     borderRadius: 100,

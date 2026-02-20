@@ -7,9 +7,11 @@ import {
 } from "react-native";
 import { getLyricSnippets, deleteLyricSnippet, LyricSnippet, updateSnippetColor } from "@/lib/storage";
 import { getColorsFromImageUrl } from "@/lib/albumArtColors";
+import { useTheme } from "@/lib/theme-context";
 import { SnippetCard } from "./SnippetCard";
 
 export function LyricSnippets() {
+  const { colors } = useTheme();
   const [snippets, setSnippets] = useState<LyricSnippet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +65,7 @@ export function LyricSnippets() {
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color={colors.tint} />
       </View>
     );
   }
@@ -74,7 +76,7 @@ export function LyricSnippets() {
 
   if (snippets.length === 0) {
     return (
-      <Text style={styles.emptyText}>
+      <Text style={[styles.emptyText, { color: colors.textMuted }]}>
         Search for a song above to save your first snippet!
       </Text>
     );
@@ -96,5 +98,5 @@ export function LyricSnippets() {
 const styles = StyleSheet.create({
   centered: { padding: 24, alignItems: "center" },
   errorText: { color: "#ff4444", fontSize: 14 },
-  emptyText: { color: "rgba(255,255,255,0.5)", fontSize: 15 },
+  emptyText: { fontSize: 15 },
 });

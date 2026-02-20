@@ -1,8 +1,13 @@
 import { useEffect } from "react";
+import { View } from "react-native";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useFonts } from "expo-font";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { AuthProvider, useAuth } from "@/lib/auth-context";
+import { ThemeProvider, useTheme } from "@/lib/theme-context";
+
+const DOTO_FONT = require("@/assets/fonts/Doto-VariableFont_ROND,wght.ttf");
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
@@ -29,13 +34,30 @@ function RootLayoutNav() {
   );
 }
 
-export default function RootLayout() {
+function StatusBarThemed() {
+  const { colors } = useTheme();
+  return <StatusBar style={colors.statusBar} />;
+}
+
+function ThemeRoot() {
+  const { colors } = useTheme();
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#121212" }}>
-      <StatusBar style="light" />
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBarThemed />
       <AuthProvider>
         <RootLayoutNav />
       </AuthProvider>
-    </GestureHandlerRootView>
+    </View>
+  );
+}
+
+export default function RootLayout() {
+  useFonts({ Doto: DOTO_FONT });
+  return (
+    <ThemeProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <ThemeRoot />
+      </GestureHandlerRootView>
+    </ThemeProvider>
   );
 }
