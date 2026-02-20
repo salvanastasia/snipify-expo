@@ -8,9 +8,10 @@ import {
   Image,
   StyleSheet,
   ActivityIndicator,
-  Modal,
   Keyboard,
+  Platform,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,6 +19,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { saveLyricSnippet } from "@/lib/storage";
 import { getColorsFromImageUrl } from "@/lib/albumArtColors";
 import { LyricsBottomSheet } from "./LyricsBottomSheet";
+
+const GRADIENT_HEIGHT = 120;
 
 const RECENT_SEARCHES_KEY = "recent-searches";
 const MAX_RECENT = 6;
@@ -48,12 +51,26 @@ export function SearchBar({ onSnippetSaved }: Props) {
   const [searchMode, setSearchMode] = useState<"songs" | "friends">("songs");
   const [selectedSong, setSelectedSong] = useState<SearchResult | null>(null);
   const [lyricsOpen, setLyricsOpen] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     AsyncStorage.getItem(RECENT_SEARCHES_KEY).then((val) => {
       if (val) setRecentSearches(JSON.parse(val));
     });
+  }, []);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, (e) =>
+      setKeyboardHeight(e.endCoordinates.height)
+    );
+    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
   }, []);
 
   const search = useCallback(
@@ -153,34 +170,39 @@ export function SearchBar({ onSnippetSaved }: Props) {
   const showRecent = searchMode === "songs" && recentSearches.length > 0 && !query.trim();
   const listData = results.length > 0 ? results : showRecent ? recentSearches : [];
 
+  const bottomInset = keyboardHeight > 0 ? 8 : Math.max(insets.bottom, 8);
+
   return (
     <>
-      {/* Fixed search bar at bottom */}
-      <View style={[styles.wrapper, { paddingBottom: Math.max(insets.bottom, 8) }]}>
-        <View style={styles.inputRow}>
-          <Ionicons name="search" size={18} color="rgba(255,255,255,0.5)" style={styles.searchIcon} />
-          <TextInput
-            style={styles.input}
-            placeholder={`Search for ${searchMode === "songs" ? "a song" : "friends"}...`}
-            placeholderTextColor="rgba(255,255,255,0.4)"
-            value={query}
-            onChangeText={handleChange}
-            onFocus={() => { if (!query && recentSearches.length > 0) setIsOpen(true); }}
-            returnKeyType="search"
-          />
-          <TouchableOpacity
-            style={styles.modeToggle}
-            onPress={() => {
-              setSearchMode((m) => (m === "songs" ? "friends" : "songs"));
-              setResults([]);
-              setIsOpen(false);
-            }}
-          >
-            <Text style={styles.modeText}>{searchMode === "songs" ? "Songs" : "Friends"}</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Dropdown results (opens upward) */}
+      {/* Gradient fade behind search bar */}
+      <View
+        pointerEvents="none"
+        style={[
+          styles.gradientContainer,
+          {
+            bottom: keyboardHeight,
+            height: GRADIENT_HEIGHT + 56 + bottomInset,
+          },
+        ]}
+      >
+        <LinearGradient
+          colors={["rgba(18, 18, 18, 0)", "#121212"]}
+          style={StyleSheet.absoluteFill}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+        />
+      </View>
+      {/* Fixed at bottom: from bottom = keyboard, then search bar, then results */}
+      <View
+        style={[
+          styles.wrapper,
+          {
+            bottom: keyboardHeight,
+            paddingBottom: bottomInset,
+          },
+        ]}
+      >
+        {/* Results above the search bar (order: bottom = keyboard → searchbar → results) */}
         {isOpen && (
           <View style={styles.dropdown}>
             {loading ? (
@@ -211,6 +233,29 @@ export function SearchBar({ onSnippetSaved }: Props) {
             )}
           </View>
         )}
+
+        <View style={styles.inputRow}>
+          <Ionicons name="search" size={18} color="rgba(255,255,255,0.5)" style={styles.searchIcon} />
+          <TextInput
+            style={styles.input}
+            placeholder={`Search for ${searchMode === "songs" ? "a song" : "friends"}...`}
+            placeholderTextColor="rgba(255,255,255,0.4)"
+            value={query}
+            onChangeText={handleChange}
+            onFocus={() => { if (!query && recentSearches.length > 0) setIsOpen(true); }}
+            returnKeyType="search"
+          />
+          <TouchableOpacity
+            style={styles.modeToggle}
+            onPress={() => {
+              setSearchMode((m) => (m === "songs" ? "friends" : "songs"));
+              setResults([]);
+              setIsOpen(false);
+            }}
+          >
+            <Text style={styles.modeText}>{searchMode === "songs" ? "Songs" : "Friends"}</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Backdrop to close */}
@@ -250,9 +295,15 @@ function SongRow({ song, onPress }: { song: any; onPress: () => void }) {
 }
 
 const styles = StyleSheet.create({
+  gradientContainer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    zIndex: 99,
+    overflow: "hidden",
+  },
   wrapper: {
     position: "absolute",
-    bottom: 0,
     left: 0,
     right: 0,
     zIndex: 100,
