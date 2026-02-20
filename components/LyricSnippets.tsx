@@ -27,7 +27,12 @@ export function LyricSnippets() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [layout, setLayout] = useState<SnippetsLayoutId>("list");
+  const [listHeight, setListHeight] = useState<number | null>(null);
+  const [gridHeight, setGridHeight] = useState<number | null>(null);
   const scrollRef = useRef<ScrollView>(null);
+
+  const swiperHeight =
+    layout === "list" ? listHeight : gridHeight;
 
   useEffect(() => {
     load();
@@ -122,13 +127,17 @@ export function LyricSnippets() {
   }
 
   const listPage = (
-    <View style={[styles.page, { width: SCREEN_WIDTH }]}>
+    <View
+      style={[styles.page, { width: SCREEN_WIDTH }]}
+      onLayout={(e) => setListHeight(e.nativeEvent.layout.height)}
+    >
       <View style={styles.pageInner}>
-        {snippets.map((snippet) => (
+        {snippets.map((snippet, index) => (
           <SnippetCard
             key={snippet.id}
             snippet={snippet}
             onDelete={handleDelete}
+            isLast={index === snippets.length - 1}
           />
         ))}
       </View>
@@ -136,10 +145,16 @@ export function LyricSnippets() {
   );
 
   const gridPage = (
-    <View style={[styles.page, styles.grid, { width: SCREEN_WIDTH }]}>
+    <View
+      style={[styles.page, styles.grid, { width: SCREEN_WIDTH }]}
+      onLayout={(e) => setGridHeight(e.nativeEvent.layout.height)}
+    >
       <View style={styles.pageInner}>
         {rows.map((row, rowIndex) => (
-          <View key={rowIndex} style={styles.gridRow}>
+          <View
+            key={rowIndex}
+            style={[styles.gridRow, rowIndex === rows.length - 1 && styles.gridRowLast]}
+          >
             {row.map((snippet) => (
               <SnippetGridCard key={snippet.id} snippet={snippet} />
             ))}
@@ -150,19 +165,21 @@ export function LyricSnippets() {
   );
 
   return (
-    <ScrollView
-      ref={scrollRef}
-      horizontal
-      pagingEnabled
-      showsHorizontalScrollIndicator={false}
-      onMomentumScrollEnd={handleMomentumScrollEnd}
-      scrollEventThrottle={16}
-      style={styles.swiper}
-      contentContainerStyle={styles.swiperContent}
-    >
-      {listPage}
-      {gridPage}
-    </ScrollView>
+    <View style={swiperHeight != null ? { height: swiperHeight } : undefined}>
+      <ScrollView
+        ref={scrollRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onMomentumScrollEnd={handleMomentumScrollEnd}
+        scrollEventThrottle={16}
+        style={[styles.swiper, swiperHeight != null && { height: swiperHeight }]}
+        contentContainerStyle={styles.swiperContent}
+      >
+        {listPage}
+        {gridPage}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -171,7 +188,7 @@ const styles = StyleSheet.create({
   errorText: { color: "#ff4444", fontSize: 14 },
   emptyText: { fontSize: 15 },
   swiper: { flexGrow: 0 },
-  swiperContent: { flexGrow: 0 },
+  swiperContent: { flexGrow: 0, alignItems: "flex-start" },
   page: { flexGrow: 0 },
   pageInner: { paddingHorizontal: PAGE_PADDING_H },
   grid: { gap: SNIPPET_GRID_CARD_GAP },
@@ -180,4 +197,5 @@ const styles = StyleSheet.create({
     gap: SNIPPET_GRID_CARD_GAP,
     marginBottom: SNIPPET_GRID_CARD_GAP,
   },
+  gridRowLast: { marginBottom: 0 },
 });

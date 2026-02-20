@@ -16,9 +16,10 @@ interface Props {
   snippet: LyricSnippet;
   readOnly?: boolean;
   onDelete?: (id: string) => void;
+  isLast?: boolean;
 }
 
-export function SnippetCard({ snippet, readOnly = false, onDelete }: Props) {
+export function SnippetCard({ snippet, readOnly = false, onDelete, isLast }: Props) {
   const [lyricsOpen, setLyricsOpen] = useState(false);
 
   // Parse color from stored value
@@ -40,7 +41,7 @@ export function SnippetCard({ snippet, readOnly = false, onDelete }: Props) {
   return (
     <>
       <TouchableOpacity
-        style={styles.card}
+        style={[styles.card, isLast && styles.cardLast]}
         onPress={() => setLyricsOpen(true)}
         activeOpacity={0.9}
       >
@@ -105,6 +106,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     minHeight: 180,
   },
+  cardLast: { marginBottom: 0 },
   cardContent: {
     padding: 16,
     flex: 1,

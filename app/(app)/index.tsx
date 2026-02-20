@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
   },
   profileSetupBtnText: { fontSize: 15, fontWeight: "600" },
   profileLabel: { fontSize: 12 },
-  section: { paddingHorizontal: 24, marginTop: 24 },
+  section: { paddingHorizontal: 24, marginTop: 16 },
   snippetsSwiperWrapper: { marginHorizontal: -24 },
   sectionTitle: {
     fontSize: 28,
