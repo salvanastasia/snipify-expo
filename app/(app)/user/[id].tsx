@@ -12,7 +12,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "@/lib/supabase";
-import { getLyricSnippetsByUserId, LyricSnippet } from "@/lib/storage";
+import { getLyricSnippetsByUserId, LyricSnippet, updateSnippetColor } from "@/lib/storage";
+import { getColorsFromImageUrl } from "@/lib/albumArtColors";
 import { useAuth } from "@/lib/auth-context";
 import { SnippetCard } from "@/components/SnippetCard";
 
@@ -46,6 +47,27 @@ export default function UserProfileScreen() {
       ]);
       setProfile(profileData);
       setSnippets(snippetsData);
+
+      // Fetch colors for old snippets that don't have colors
+      const snippetsWithoutColors = snippetsData.filter(
+        (s) => !s.color && s.album_art_url
+      );
+
+      // Update colors in background (don't block UI)
+      for (const snippet of snippetsWithoutColors) {
+        try {
+          const color = await getColorsFromImageUrl(snippet.album_art_url);
+          if (color) {
+            await updateSnippetColor(snippet.id, color);
+            // Update local state
+            setSnippets((prev) =>
+              prev.map((s) => (s.id === snippet.id ? { ...s, color } : s))
+            );
+          }
+        } catch (e) {
+          console.error(`Failed to fetch color for snippet ${snippet.id}:`, e);
+        }
+      }
 
       // Check follow status
       if (user) {
