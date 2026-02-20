@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Alert,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { LyricSnippet } from "@/lib/storage";
 import { LyricsBottomSheet } from "./LyricsBottomSheet";
@@ -39,12 +40,17 @@ export function SnippetCard({ snippet, readOnly = false, onDelete }: Props) {
   return (
     <>
       <TouchableOpacity
-        style={[styles.card, { backgroundColor: bgColor }]}
+        style={styles.card}
         onPress={() => setLyricsOpen(true)}
         activeOpacity={0.9}
       >
-        {/* Background gradient effect */}
-        <View style={[styles.cardGradient, { backgroundColor: bgColorDark }]} />
+        {/* Linear gradient background */}
+        <LinearGradient
+          colors={[bgColor, bgColorDark]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
 
         <View style={styles.cardContent}>
           <View style={styles.topRow}>
@@ -94,14 +100,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     overflow: "hidden",
     minHeight: 180,
-  },
-  cardGradient: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: "45%",
-    opacity: 0.4,
   },
   cardContent: {
     padding: 20,

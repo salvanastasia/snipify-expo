@@ -5,7 +5,8 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
-import { getLyricSnippets, deleteLyricSnippet, LyricSnippet } from "@/lib/storage";
+import { getLyricSnippets, deleteLyricSnippet, LyricSnippet, updateSnippetColor } from "@/lib/storage";
+import { getColorsFromImageUrl } from "@/lib/albumArtColors";
 import { SnippetCard } from "./SnippetCard";
 
 export function LyricSnippets() {
@@ -22,6 +23,27 @@ export function LyricSnippets() {
       setLoading(true);
       const data = await getLyricSnippets();
       setSnippets(data);
+      
+      // Fetch colors for old snippets that don't have colors
+      const snippetsWithoutColors = data.filter(
+        (s) => !s.color && s.album_art_url
+      );
+      
+      // Update colors in background (don't block UI)
+      for (const snippet of snippetsWithoutColors) {
+        try {
+          const color = await getColorsFromImageUrl(snippet.album_art_url);
+          if (color) {
+            await updateSnippetColor(snippet.id, color);
+            // Update local state
+            setSnippets((prev) =>
+              prev.map((s) => (s.id === snippet.id ? { ...s, color } : s))
+            );
+          }
+        } catch (e) {
+          console.error(`Failed to fetch color for snippet ${snippet.id}:`, e);
+        }
+      }
     } catch {
       setError("Failed to load snippets.");
     } finally {

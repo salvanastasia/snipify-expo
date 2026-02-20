@@ -122,3 +122,11 @@ export async function updateLyricSnippet(snippet: LyricSnippet): Promise<void> {
     .eq("id", snippet.id);
   if (error) throw error;
 }
+
+export async function updateSnippetColor(id: string, color: string | null): Promise<void> {
+  const { error } = await supabase
+    .from("lyric_snippets")
+    .update({ color })
+    .eq("id", id);
+  if (error) throw error;
+}
