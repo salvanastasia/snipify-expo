@@ -22,25 +22,38 @@ import type { ThemeId } from "@/lib/theme-context";
 import { THEME_SWATCH_COLORS } from "@/lib/theme-context";
 
 const FONT_STORAGE_KEY = "profile_font";
+export const LAYOUT_STORAGE_KEY = "snippets_layout";
 type FontChoice = "default" | "Doto";
+export type SnippetsLayoutId = "list" | "grid";
 
 const THEME_OPTIONS: { id: ThemeId; label: string }[] = [
   { id: "default", label: "Default theme" },
   { id: "cream", label: "Cream theme" },
 ];
 
+const LAYOUT_OPTIONS: { id: SnippetsLayoutId; label: string }[] = [
+  { id: "list", label: "List" },
+  { id: "grid", label: "Grid" },
+];
+
 interface Props {
   userId: string;
+  profileSetupOpen: boolean;
+  onProfileSetupClose: () => void;
 }
 
-export function ProfileName({ userId }: Props) {
+export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: Props) {
   const { signOut } = useAuth();
   const { theme, colors, setTheme } = useTheme();
   const [name, setName] = useState("");
-  const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
   const [font, setFont] = useState<FontChoice>("default");
+  const [layout, setLayout] = useState<SnippetsLayoutId>("list");
+
+  useEffect(() => {
+    if (profileSetupOpen) setDraft(name);
+  }, [profileSetupOpen, name]);
 
   useEffect(() => {
     load();
@@ -49,8 +62,12 @@ export function ProfileName({ userId }: Props) {
   useEffect(() => {
     (async () => {
       try {
-        const stored = await AsyncStorage.getItem(FONT_STORAGE_KEY);
-        if (stored === "Doto" || stored === "default") setFont(stored);
+        const [fontStored, layoutStored] = await Promise.all([
+          AsyncStorage.getItem(FONT_STORAGE_KEY),
+          AsyncStorage.getItem(LAYOUT_STORAGE_KEY),
+        ]);
+        if (fontStored === "Doto" || fontStored === "default") setFont(fontStored);
+        if (layoutStored === "list" || layoutStored === "grid") setLayout(layoutStored);
       } catch {}
     })();
   }, []);
@@ -69,14 +86,19 @@ export function ProfileName({ userId }: Props) {
     AsyncStorage.setItem(FONT_STORAGE_KEY, value).catch(() => {});
   };
 
+  const setLayoutAndPersist = (value: SnippetsLayoutId) => {
+    setLayout(value);
+    AsyncStorage.setItem(LAYOUT_STORAGE_KEY, value).catch(() => {});
+  };
+
   const handleCancel = () => {
     Keyboard.dismiss();
-    setEditing(false);
+    onProfileSetupClose();
   };
 
   const handleSignOut = () => {
     Keyboard.dismiss();
-    setEditing(false);
+    onProfileSetupClose();
     signOut();
   };
 
@@ -90,7 +112,7 @@ export function ProfileName({ userId }: Props) {
         .eq("id", userId);
       if (error) throw error;
       setName(draft.trim());
-      setEditing(false);
+      onProfileSetupClose();
     } catch {
       Alert.alert("Error", "Failed to update name.");
     } finally {
@@ -105,19 +127,13 @@ export function ProfileName({ userId }: Props) {
 
   return (
     <>
-      <TouchableOpacity
-        style={styles.nameRow}
-        onPress={() => { setDraft(name); setEditing(true); }}
-        accessibilityLabel="Edit profile name"
-        accessibilityRole="button"
-      >
+      <View style={styles.nameRow}>
         <Text style={[styles.name, { color: colors.text }, font === "Doto" && { fontFamily: "Doto" }]}>
           {name || "Add your name"}
         </Text>
-        <Ionicons name="pencil" size={14} color={colors.textMuted} />
-      </TouchableOpacity>
+      </View>
 
-      <Modal visible={editing} transparent animationType="fade" onRequestClose={handleCancel}>
+      <Modal visible={profileSetupOpen} transparent animationType="fade" onRequestClose={handleCancel}>
         <View style={styles.overlayRoot}>
           <View style={[StyleSheet.absoluteFill, { overflow: "hidden" }]} pointerEvents="none">
             <BlurView intensity={24} tint={isCream ? "light" : "dark"} style={StyleSheet.absoluteFill} />
@@ -136,7 +152,7 @@ export function ProfileName({ userId }: Props) {
           >
             <View style={[styles.dialog, { backgroundColor: colors.card }]}>
               <Text style={[styles.dialogTitle, { color: colors.text }]} accessibilityRole="header">
-                Edit Name
+                Profile Setup
               </Text>
               <TextInput
                 style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
@@ -210,6 +226,32 @@ export function ProfileName({ userId }: Props) {
                   </TouchableOpacity>
                 </View>
               </View>
+              <View style={styles.layoutRow}>
+                <Text style={[styles.fontLabel, { color: colors.textMuted }]}>Layout</Text>
+                <View style={styles.layoutSwitcher}>
+                  {LAYOUT_OPTIONS.map((opt) => {
+                    const selected = layout === opt.id;
+                    return (
+                      <TouchableOpacity
+                        key={opt.id}
+                        style={[
+                          styles.layoutOption,
+                          { backgroundColor: selected ? (isCream ? colors.text : "#fff") : colors.input },
+                          selected && { borderColor: colors.text, borderWidth: 2 },
+                        ]}
+                        onPress={() => setLayoutAndPersist(opt.id)}
+                        accessibilityLabel={`${opt.label} layout${selected ? ", selected" : ""}`}
+                        accessibilityRole="button"
+                        accessibilityState={{ selected }}
+                      >
+                        <Text style={[styles.layoutOptionText, selected ? (isCream ? { color: colors.background } : styles.fontOptionTextActive) : { color: colors.text }]}>
+                          {opt.label}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              </View>
               <View style={styles.buttons}>
                 <TouchableOpacity onPress={handleCancel} style={[styles.cancelBtn, { backgroundColor: colors.input }]}>
                   <Text style={[styles.cancelText, { color: colors.textMuted }]}>Cancel</Text>
@@ -272,6 +314,18 @@ const styles = StyleSheet.create({
   },
   fontAaText: { fontSize: 22, fontWeight: "700" },
   fontOptionTextActive: { color: "#000", fontWeight: "600" },
+  layoutRow: { gap: 8 },
+  layoutSwitcher: { flexDirection: "row", gap: 8 },
+  layoutOption: {
+    flex: 1,
+    height: 40,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  layoutOptionText: { fontSize: 15, fontWeight: "500" },
   themeRow: { gap: 10 },
   themeLabel: { fontSize: 18, fontWeight: "700" },
   themeSwatches: { flexDirection: "row", gap: 16, alignItems: "center" },

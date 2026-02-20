@@ -5,19 +5,30 @@ import {
   ActivityIndicator,
   StyleSheet,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getLyricSnippets, deleteLyricSnippet, LyricSnippet, updateSnippetColor } from "@/lib/storage";
 import { getColorsFromImageUrl } from "@/lib/albumArtColors";
 import { useTheme } from "@/lib/theme-context";
+import { LAYOUT_STORAGE_KEY } from "./ProfileName";
+import type { SnippetsLayoutId } from "./ProfileName";
 import { SnippetCard } from "./SnippetCard";
+import { SnippetGridCard, SNIPPET_GRID_CARD_GAP } from "./SnippetGridCard";
 
 export function LyricSnippets() {
   const { colors } = useTheme();
   const [snippets, setSnippets] = useState<LyricSnippet[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [layout, setLayout] = useState<SnippetsLayoutId>("list");
 
   useEffect(() => {
     load();
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.getItem(LAYOUT_STORAGE_KEY).then((stored) => {
+      if (stored === "list" || stored === "grid") setLayout(stored);
+    });
   }, []);
 
   const load = async () => {
@@ -82,6 +93,28 @@ export function LyricSnippets() {
     );
   }
 
+  if (layout === "grid") {
+    const rows: LyricSnippet[][] = [];
+    for (let i = 0; i < snippets.length; i += 2) {
+      rows.push(snippets.slice(i, i + 2));
+    }
+    return (
+      <View style={styles.grid}>
+        {rows.map((row, rowIndex) => (
+          <View key={rowIndex} style={styles.gridRow}>
+            {row.map((snippet) => (
+              <SnippetGridCard
+                key={snippet.id}
+                snippet={snippet}
+                onDelete={handleDelete}
+              />
+            ))}
+          </View>
+        ))}
+      </View>
+    );
+  }
+
   return (
     <View>
       {snippets.map((snippet) => (
@@ -99,4 +132,10 @@ const styles = StyleSheet.create({
   centered: { padding: 24, alignItems: "center" },
   errorText: { color: "#ff4444", fontSize: 14 },
   emptyText: { fontSize: 15 },
+  grid: { gap: SNIPPET_GRID_CARD_GAP },
+  gridRow: {
+    flexDirection: "row",
+    gap: SNIPPET_GRID_CARD_GAP,
+    marginBottom: SNIPPET_GRID_CARD_GAP,
+  },
 });

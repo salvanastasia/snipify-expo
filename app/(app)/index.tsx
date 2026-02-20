@@ -26,6 +26,7 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const [refreshKey, setRefreshKey] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [profileSetupOpen, setProfileSetupOpen] = useState(false);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -70,12 +71,28 @@ export default function HomeScreen() {
           }
         >
           <View style={styles.profileHeader}>
-            <ProfilePhoto userId={user.id} />
-            <View style={styles.profileInfo}>
-              <Text style={[styles.profileLabel, { color: colors.textMuted }]}>Profile</Text>
-              <ProfileName userId={user.id} />
-              <ProfileStats userId={user.id} />
+            <View style={styles.profileHeaderRow}>
+              <ProfilePhoto userId={user.id} />
+              <View style={styles.profileInfo}>
+                <Text style={[styles.profileLabel, { color: colors.textMuted }]}>Profile</Text>
+                <ProfileName
+                  userId={user.id}
+                  profileSetupOpen={profileSetupOpen}
+                  onProfileSetupClose={() => {
+                  setProfileSetupOpen(false);
+                  setRefreshKey((k) => k + 1);
+                }}
+                />
+                <ProfileStats userId={user.id} />
+              </View>
             </View>
+            <TouchableOpacity
+              style={[styles.profileSetupBtn, { backgroundColor: colors.input }]}
+              onPress={() => setProfileSetupOpen(true)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.profileSetupBtnText, { color: colors.text }]}>Profile Setup</Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
@@ -107,15 +124,27 @@ const styles = StyleSheet.create({
   scroll: { flex: 1 },
   scrollContent: { paddingTop: 0, paddingBottom: 80 },
   profileHeader: {
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: "column",
     paddingHorizontal: 16,
     paddingTop: 98,
     paddingBottom: 24,
     gap: 16,
+  },
+  profileHeaderRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 16,
     flexWrap: "wrap",
   },
   profileInfo: { flex: 1, gap: 4 },
+  profileSetupBtn: {
+    alignSelf: "stretch",
+    height: 44,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  profileSetupBtnText: { fontSize: 15, fontWeight: "600" },
   profileLabel: { fontSize: 12 },
   section: { paddingHorizontal: 24, marginTop: 24 },
   sectionTitle: {
