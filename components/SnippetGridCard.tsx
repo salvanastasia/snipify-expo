@@ -11,7 +11,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { LyricSnippet } from "@/lib/storage";
-import { LyricsBottomSheet } from "./LyricsBottomSheet";
+import { LyricSnippetExpandedModal } from "./LyricSnippetExpandedModal";
 
 const CARD_GAP = 12;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -93,17 +93,12 @@ export function SnippetGridCard({ snippet, readOnly = false, onDelete }: Props) 
         </TouchableOpacity>
       </View>
 
-      <LyricsBottomSheet
-        isOpen={lyricsOpen}
+      <LyricSnippetExpandedModal
+        visible={lyricsOpen}
         onClose={() => setLyricsOpen(false)}
-        song={{
-          title: snippet.song_title,
-          artist_names: snippet.artist_name,
-          song_art_image_thumbnail_url: snippet.album_art_url || "",
-        }}
-        onSave={async () => {}}
-        initialLyrics={snippet.lyrics}
+        snippet={snippet}
         readOnly={readOnly}
+        onDelete={onDelete}
       />
     </>
   );
