@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
-  ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -113,9 +112,42 @@ export default function UserProfileScreen() {
 
   if (loading) {
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator color="#fff" size="large" />
-      </View>
+      <SafeAreaView style={styles.container} edges={["top"]}>
+        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <Ionicons name="chevron-back" size={24} color="#fff" />
+        </TouchableOpacity>
+        <ScrollView
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Ghost profile header */}
+          <View style={styles.profileHeader}>
+            <View style={[styles.avatar, styles.ghostAvatar]} />
+            <View style={[styles.ghostText, { width: 160, height: 24, marginTop: 8 }]} />
+            <View style={[styles.ghostText, { width: 100, height: 14, marginTop: 8 }]} />
+            <View style={styles.ghostButton} />
+          </View>
+          {/* Ghost section title */}
+          <View style={[styles.ghostText, { width: 120, height: 20, marginBottom: 16 }]} />
+          {/* Ghost snippet cards */}
+          {[1, 2, 3].map((i) => (
+            <View key={i} style={styles.ghostCard}>
+              <View style={styles.ghostCardTopRow}>
+                <View style={styles.ghostCardLyrics}>
+                  <View style={[styles.ghostText, { width: "100%", height: 16 }]} />
+                  <View style={[styles.ghostText, { width: "90%", height: 16, marginTop: 8 }]} />
+                  <View style={[styles.ghostText, { width: "70%", height: 16, marginTop: 8 }]} />
+                </View>
+                <View style={[styles.ghostAlbumArt]} />
+              </View>
+              <View style={styles.ghostCardFooter}>
+                <View style={[styles.ghostText, { width: 80, height: 14 }]} />
+                <View style={[styles.ghostText, { width: 60, height: 12, marginTop: 4 }]} />
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
@@ -174,7 +206,6 @@ export default function UserProfileScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#121212" },
-  centered: { flex: 1, backgroundColor: "#121212", justifyContent: "center", alignItems: "center" },
   backButton: { padding: 16 },
   content: { paddingHorizontal: 16, paddingBottom: 40 },
   profileHeader: { alignItems: "center", gap: 8, marginBottom: 24 },
@@ -202,4 +233,38 @@ const styles = StyleSheet.create({
     fontWeight: "700",
     marginBottom: 16,
   },
+  // Ghost skeleton
+  ghostAvatar: { backgroundColor: "rgba(255,255,255,0.06)" },
+  ghostText: {
+    backgroundColor: "rgba(255,255,255,0.06)",
+    borderRadius: 4,
+  },
+  ghostButton: {
+    width: 120,
+    height: 40,
+    borderRadius: 100,
+    backgroundColor: "rgba(255,255,255,0.06)",
+    marginTop: 8,
+  },
+  ghostCard: {
+    borderRadius: 16,
+    marginBottom: 12,
+    minHeight: 180,
+    padding: 20,
+    backgroundColor: "rgba(255,255,255,0.06)",
+  },
+  ghostCardTopRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 12,
+    flex: 1,
+  },
+  ghostCardLyrics: { flex: 1 },
+  ghostAlbumArt: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "rgba(255,255,255,0.08)",
+  },
+  ghostCardFooter: { marginTop: 12 },
 });
