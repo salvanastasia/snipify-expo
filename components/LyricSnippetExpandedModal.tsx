@@ -3,13 +3,11 @@ import {
   View,
   Text,
   Modal,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   ScrollView,
   StyleSheet,
   Image,
   Dimensions,
-  Alert,
   Animated,
   Easing,
 } from "react-native";
@@ -26,8 +24,6 @@ interface Props {
   visible: boolean;
   onClose: () => void;
   snippet: LyricSnippet;
-  readOnly?: boolean;
-  onDelete?: (id: string) => void;
 }
 
 const ENTRANCE_DURATION = 350;
@@ -37,8 +33,6 @@ export function LyricSnippetExpandedModal({
   visible,
   onClose,
   snippet,
-  readOnly = false,
-  onDelete,
 }: Props) {
   const translateY = useRef(new Animated.Value(300)).current;
   const opacity = useRef(new Animated.Value(0)).current;
@@ -79,20 +73,6 @@ export function LyricSnippetExpandedModal({
   const colors = snippet.color?.split("|") || ["#8B8E98", "#6B6E78"];
   const bgColor = colors[0] || "#8B8E98";
   const bgColorDark = colors[1] || "#6B6E78";
-
-  const handleDelete = () => {
-    Alert.alert("Delete Snippet", "Are you sure you want to delete this snippet?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => {
-          onClose();
-          onDelete?.(snippet.id);
-        },
-      },
-    ]);
-  };
 
   return (
     <Modal
@@ -149,11 +129,6 @@ export function LyricSnippetExpandedModal({
                     {snippet.artist_name}
                   </Text>
                 </View>
-                {!readOnly && (
-                  <TouchableOpacity onPress={handleDelete} style={styles.deleteButton} activeOpacity={0.7}>
-                    <Ionicons name="trash-outline" size={22} color="rgba(255,255,255,0.6)" />
-                  </TouchableOpacity>
-                )}
               </View>
             </View>
           </Animated.View>
@@ -207,7 +182,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 12,
     marginTop: 16,
-    paddingRight: 40,
   },
   albumArt: {
     width: 56,
@@ -233,8 +207,5 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.6)",
     fontSize: 14,
     marginTop: 2,
-  },
-  deleteButton: {
-    padding: 4,
   },
 });

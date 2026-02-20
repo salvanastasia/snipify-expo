@@ -106,7 +106,6 @@ export function LyricSnippets() {
               <SnippetGridCard
                 key={snippet.id}
                 snippet={snippet}
-                onDelete={handleDelete}
               />
             ))}
           </View>

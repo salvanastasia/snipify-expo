@@ -5,7 +5,6 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  Alert,
   Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -24,27 +23,14 @@ const TILT_OFFSET_X = -10;
 interface Props {
   snippet: LyricSnippet;
   readOnly?: boolean;
-  onDelete?: (id: string) => void;
 }
 
-export function SnippetGridCard({ snippet, readOnly = false, onDelete }: Props) {
+export function SnippetGridCard({ snippet, readOnly = false }: Props) {
   const [lyricsOpen, setLyricsOpen] = useState(false);
 
   const colors = snippet.color?.split("|") || ["#8B8E98", "#6B6E78"];
   const bgColor = colors[0] || "#8B8E98";
   const bgColorDark = colors[1] || "#6B6E78";
-
-  const handleDelete = (e: any) => {
-    e?.stopPropagation?.();
-    Alert.alert("Delete Snippet", "Are you sure you want to delete this snippet?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => onDelete?.(snippet.id),
-      },
-    ]);
-  };
 
   return (
     <>
@@ -84,12 +70,7 @@ export function SnippetGridCard({ snippet, readOnly = false, onDelete }: Props) 
               </Text>
             </View>
           </View>
-          {!readOnly && (
-              <TouchableOpacity onPress={handleDelete} style={styles.deleteButton} activeOpacity={0.7}>
-                <Ionicons name="trash-outline" size={16} color="rgba(255,255,255,0.6)" />
-              </TouchableOpacity>
-            )}
-          </View>
+        </View>
         </TouchableOpacity>
       </View>
 
@@ -97,8 +78,6 @@ export function SnippetGridCard({ snippet, readOnly = false, onDelete }: Props) 
         visible={lyricsOpen}
         onClose={() => setLyricsOpen(false)}
         snippet={snippet}
-        readOnly={readOnly}
-        onDelete={onDelete}
       />
     </>
   );
@@ -183,12 +162,6 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.6)",
     fontSize: 11,
     marginTop: 2,
-  },
-  deleteButton: {
-    position: "absolute",
-    right: 8,
-    bottom: 8,
-    padding: 4,
   },
 });
 
