@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Snipify",
+    "slug": "snipify",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "snipify",
+    "backgroundColor": "#121212",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.yourname.snipify",
+      "infoPlist": {
+        "UIStatusBarStyle": "UIStatusBarStyleLightContent"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#121212"
+      },
+      "package": "com.yourname.snipify",
+      "statusBar": {
+        "backgroundColor": "#121212",
+        "style": "light"
+      }
+    },
+    "plugins": [
+      "expo-router",
+      "expo-system-ui"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "newArchEnabled": true
+  }
+}
