@@ -117,7 +117,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     paddingHorizontal: 16,
-    paddingVertical: 24,
+    paddingTop: 98,
+    paddingBottom: 24,
     gap: 16,
     flexWrap: "wrap",
   },
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#333",
   },
   signOutText: { color: "#fff", fontSize: 13 },
-  section: { paddingHorizontal: 16, marginTop: 24 },
+  section: { paddingHorizontal: 24, marginTop: 24 },
   sectionTitle: {
     color: "#fff",
     fontSize: 28,
