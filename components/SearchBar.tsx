@@ -11,6 +11,7 @@ import {
   Keyboard,
   Platform,
 } from "react-native";
+import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -20,7 +21,11 @@ import { saveLyricSnippet } from "@/lib/storage";
 import { getColorsFromImageUrl } from "@/lib/albumArtColors";
 import { LyricsBottomSheet } from "./LyricsBottomSheet";
 
-const GRADIENT_HEIGHT = 120;
+/** Fascia bassa quando tastiera chiusa (solo blur + gradient sopra la search bar) */
+const STRIP_HEIGHT_CLOSED = 64;
+/** Altezza overlay sopra tastiera quando aperta (copre search bar + risultati) */
+const OVERLAY_HEIGHT_KEYBOARD_OPEN = 56 + 400 + 16;
+const BLUR_INTENSITY = 24;
 
 const RECENT_SEARCHES_KEY = "recent-searches";
 const MAX_RECENT = 6;
@@ -171,22 +176,35 @@ export function SearchBar({ onSnippetSaved }: Props) {
   const listData = results.length > 0 ? results : showRecent ? recentSearches : [];
 
   const bottomInset = keyboardHeight > 0 ? 8 : Math.max(insets.bottom, 8);
+  const isKeyboardOpen = keyboardHeight > 0;
 
   return (
     <>
-      {/* Gradient fade behind search bar */}
+      {/* Sfondo: tastiera chiusa = solo gradient; tastiera aperta = overlay blur + gradient per leggibilità risultati */}
       <View
         pointerEvents="none"
         style={[
           styles.gradientContainer,
           {
             bottom: keyboardHeight,
-            height: GRADIENT_HEIGHT + 56 + bottomInset,
+            height: isKeyboardOpen
+              ? OVERLAY_HEIGHT_KEYBOARD_OPEN + bottomInset
+              : STRIP_HEIGHT_CLOSED + 56 + bottomInset,
           },
         ]}
       >
+        {isKeyboardOpen && (
+          <BlurView intensity={BLUR_INTENSITY} tint="dark" style={StyleSheet.absoluteFill} />
+        )}
         <LinearGradient
-          colors={["rgba(18, 18, 18, 0)", "#121212"]}
+          colors={[
+            "rgba(18, 18, 18, 0)",
+            "rgba(18, 18, 18, 0)",
+            "rgba(18, 18, 18, 0.25)",
+            "rgba(18, 18, 18, 0.6)",
+            "#121212",
+          ]}
+          locations={[0, 0.5, 0.72, 0.88, 1]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
@@ -234,27 +252,31 @@ export function SearchBar({ onSnippetSaved }: Props) {
           </View>
         )}
 
-        <View style={styles.inputRow}>
-          <Ionicons name="search" size={18} color="rgba(255,255,255,0.5)" style={styles.searchIcon} />
-          <TextInput
-            style={styles.input}
-            placeholder={`Search for ${searchMode === "songs" ? "a song" : "friends"}...`}
-            placeholderTextColor="rgba(255,255,255,0.4)"
-            value={query}
-            onChangeText={handleChange}
-            onFocus={() => { if (!query && recentSearches.length > 0) setIsOpen(true); }}
-            returnKeyType="search"
-          />
-          <TouchableOpacity
-            style={styles.modeToggle}
-            onPress={() => {
-              setSearchMode((m) => (m === "songs" ? "friends" : "songs"));
-              setResults([]);
-              setIsOpen(false);
-            }}
-          >
-            <Text style={styles.modeText}>{searchMode === "songs" ? "Songs" : "Friends"}</Text>
-          </TouchableOpacity>
+        {/* Search bar con blur 24px applicato direttamente */}
+        <View style={styles.inputRowWrapper}>
+          <BlurView intensity={BLUR_INTENSITY} tint="dark" style={StyleSheet.absoluteFill} />
+          <View style={styles.inputRow}>
+            <Ionicons name="search" size={18} color="rgba(255,255,255,0.5)" style={styles.searchIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder={`Search for ${searchMode === "songs" ? "a song" : "friends"}...`}
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              value={query}
+              onChangeText={handleChange}
+              onFocus={() => { if (!query && recentSearches.length > 0) setIsOpen(true); }}
+              returnKeyType="search"
+            />
+            <TouchableOpacity
+              style={styles.modeToggle}
+              onPress={() => {
+                setSearchMode((m) => (m === "songs" ? "friends" : "songs"));
+                setResults([]);
+                setIsOpen(false);
+              }}
+            >
+              <Text style={styles.modeText}>{searchMode === "songs" ? "Songs" : "Friends"}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -302,6 +324,11 @@ const styles = StyleSheet.create({
     zIndex: 99,
     overflow: "hidden",
   },
+  inputRowWrapper: {
+    borderRadius: 100,
+    height: 48,
+    overflow: "hidden",
+  },
   wrapper: {
     position: "absolute",
     left: 0,
@@ -314,11 +341,10 @@ const styles = StyleSheet.create({
   inputRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderRadius: 100,
     height: 48,
     paddingHorizontal: 16,
     gap: 8,
+    backgroundColor: "transparent",
   },
   searchIcon: { marginRight: 2 },
   input: {
@@ -327,7 +353,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   modeToggle: {
-    backgroundColor: "rgba(255,255,255,0.1)",
+    backgroundColor: "rgba(255,255,255,0.15)",
     borderRadius: 100,
     paddingHorizontal: 12,
     paddingVertical: 5,
