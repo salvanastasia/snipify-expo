@@ -247,10 +247,10 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   ghostCard: {
-    borderRadius: 16,
+    borderRadius: 30,
     marginBottom: 12,
     minHeight: 180,
-    padding: 20,
+    padding: 24,
     backgroundColor: "rgba(255,255,255,0.06)",
   },
   ghostCardTopRow: {

@@ -53,18 +53,20 @@ export function SnippetCard({ snippet, readOnly = false, onDelete }: Props) {
         />
 
         <View style={styles.cardContent}>
-          <View style={styles.topRow}>
-            <Text style={styles.lyrics} numberOfLines={4}>
-              {snippet.lyrics}
-            </Text>
-            {/* Circular album art (top right) */}
-            {snippet.album_art_url && (
-              <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
-            )}
-          </View>
+          {/* Top: lyrics only */}
+          <Text style={styles.lyrics} numberOfLines={4}>
+            {snippet.lyrics}
+          </Text>
 
-          {/* Footer */}
+          {/* Bottom: album art (left) + song/artist (middle) + delete (right) */}
           <View style={styles.footer}>
+            {snippet.album_art_url ? (
+              <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
+            ) : (
+              <View style={[styles.albumArt, styles.albumArtPlaceholder]}>
+                <Ionicons name="musical-notes" size={20} color="rgba(255,255,255,0.4)" />
+              </View>
+            )}
             <View style={styles.songInfo}>
               <Text style={styles.songTitle} numberOfLines={1}>{snippet.song_title}</Text>
               <Text style={styles.artistName} numberOfLines={1}>{snippet.artist_name}</Text>
@@ -96,26 +98,14 @@ export function SnippetCard({ snippet, readOnly = false, onDelete }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 16,
+    borderRadius: 30,
     marginBottom: 12,
     overflow: "hidden",
     minHeight: 180,
   },
   cardContent: {
-    padding: 20,
-    gap: 12,
+    padding: 24,
     flex: 1,
-  },
-  topRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
-    flex: 1,
-  },
-  albumArt: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
   },
   lyrics: {
     flex: 1,
@@ -123,22 +113,35 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "500",
     lineHeight: 28,
+    paddingBottom: 16,
   },
   footer: {
     flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    marginTop: 8,
+    alignItems: "center",
+    gap: 12,
   },
-  songInfo: { flex: 1 },
+  albumArt: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: "rgba(0,0,0,0.2)",
+  },
+  albumArtPlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  songInfo: {
+    flex: 1,
+    justifyContent: "center",
+  },
   songTitle: {
     color: "rgba(255,255,255,0.9)",
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600",
   },
   artistName: {
     color: "rgba(255,255,255,0.6)",
-    fontSize: 12,
+    fontSize: 13,
     marginTop: 2,
   },
   deleteButton: { padding: 4 },

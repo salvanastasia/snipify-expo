@@ -21,7 +21,7 @@ import { ProfileStats } from "@/components/ProfileStats";
 const TOP_GRADIENT_HEIGHT = 64;
 
 export default function HomeScreen() {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const [refreshKey, setRefreshKey] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
@@ -78,9 +78,6 @@ export default function HomeScreen() {
             <ProfileName userId={user.id} />
             <ProfileStats userId={user.id} />
           </View>
-          <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
-            <Text style={styles.signOutText}>Sign Out</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Snippets */}
@@ -124,15 +121,6 @@ const styles = StyleSheet.create({
   },
   profileInfo: { flex: 1, gap: 4 },
   profileLabel: { color: "rgba(255,255,255,0.6)", fontSize: 12 },
-  signOutButton: {
-    borderRadius: 100,
-    borderWidth: 1,
-    borderColor: "#555",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: "#333",
-  },
-  signOutText: { color: "#fff", fontSize: 13 },
   section: { paddingHorizontal: 24, marginTop: 24 },
   sectionTitle: {
     color: "#fff",
