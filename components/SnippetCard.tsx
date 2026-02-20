@@ -58,7 +58,7 @@ export function SnippetCard({ snippet, readOnly = false, onDelete }: Props) {
             {snippet.lyrics}
           </Text>
 
-          {/* Bottom: album art (left) + song/artist (middle) + delete (right) */}
+          {/* Bottom: album art (left) + song/artist (middle) */}
           <View style={styles.footer}>
             {snippet.album_art_url ? (
               <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
@@ -71,12 +71,14 @@ export function SnippetCard({ snippet, readOnly = false, onDelete }: Props) {
               <Text style={styles.songTitle} numberOfLines={1}>{snippet.song_title}</Text>
               <Text style={styles.artistName} numberOfLines={1}>{snippet.artist_name}</Text>
             </View>
-            {!readOnly && (
-              <TouchableOpacity onPress={handleDelete} style={styles.deleteButton}>
-                <Ionicons name="trash-outline" size={18} color="rgba(255,255,255,0.6)" />
-              </TouchableOpacity>
-            )}
           </View>
+
+          {/* Trash icon: bottom right, respecting padding */}
+          {!readOnly && (
+            <TouchableOpacity onPress={handleDelete} style={styles.deleteButton} activeOpacity={0.7}>
+              <Ionicons name="trash-outline" size={18} color="rgba(255,255,255,0.6)" />
+            </TouchableOpacity>
+          )}
         </View>
       </TouchableOpacity>
 
@@ -104,8 +106,9 @@ const styles = StyleSheet.create({
     minHeight: 180,
   },
   cardContent: {
-    padding: 24,
+    padding: 16,
     flex: 1,
+    position: "relative",
   },
   lyrics: {
     flex: 1,
@@ -113,12 +116,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "500",
     lineHeight: 28,
-    paddingBottom: 16,
+    paddingBottom: 24,
   },
   footer: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    paddingRight: 36,
   },
   albumArt: {
     width: 56,
@@ -144,5 +148,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 2,
   },
-  deleteButton: { padding: 4 },
+  deleteButton: {
+    position: "absolute",
+    right: 16,
+    bottom: 16,
+    padding: 4,
+  },
 });
