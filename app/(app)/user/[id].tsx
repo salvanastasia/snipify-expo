@@ -187,7 +187,10 @@ export default function UserProfileScreen() {
       </TouchableOpacity>
 
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          !isOwnProfile && user && artistsInCommon.length > 0 && styles.contentWithFloatingBar,
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {/* Profile header */}
@@ -219,13 +222,35 @@ export default function UserProfileScreen() {
           )}
         </View>
 
-        {/* Artists in common - left aligned at top of snippets section */}
-        {!isOwnProfile && user && artistsInCommon.length > 0 && (
-          <TouchableOpacity
-            style={styles.artistsInCommonRow}
-            onPress={() => setArtistsInCommonModalOpen(true)}
-            activeOpacity={0.7}
-          >
+        {/* Snippets (grid by default for public profile) */}
+        <ThemedText style={styles.sectionTitle}>
+          {snippets.length} {snippets.length === 1 ? "Snippet" : "Snippets"}
+        </ThemedText>
+        <View style={styles.snippetsGrid}>
+          {(() => {
+            const rows: LyricSnippet[][] = [];
+            for (let i = 0; i < snippets.length; i += 2) {
+              rows.push(snippets.slice(i, i + 2));
+            }
+            return rows.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.snippetsGridRow}>
+                {row.map((snippet) => (
+                  <SnippetGridCard key={snippet.id} snippet={snippet} readOnly />
+                ))}
+              </View>
+            ));
+          })()}
+        </View>
+      </ScrollView>
+
+      {/* Artists in common - floating fixed at bottom center */}
+      {!isOwnProfile && user && artistsInCommon.length > 0 && (
+        <TouchableOpacity
+          style={styles.artistsInCommonFloating}
+          onPress={() => setArtistsInCommonModalOpen(true)}
+          activeOpacity={0.7}
+        >
+          <View style={styles.artistsInCommonContainer}>
             <View style={styles.artistsInCommon}>
               <View style={styles.artistsInCommonAvatars}>
                 {artistsInCommon.slice(0, 3).map((artist, index) => (
@@ -259,29 +284,9 @@ export default function UserProfileScreen() {
                 </ThemedText>
               </View>
             </View>
-          </TouchableOpacity>
-        )}
-
-        {/* Snippets (grid by default for public profile) */}
-        <ThemedText style={styles.sectionTitle}>
-          {snippets.length} {snippets.length === 1 ? "Snippet" : "Snippets"}
-        </ThemedText>
-        <View style={styles.snippetsGrid}>
-          {(() => {
-            const rows: LyricSnippet[][] = [];
-            for (let i = 0; i < snippets.length; i += 2) {
-              rows.push(snippets.slice(i, i + 2));
-            }
-            return rows.map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.snippetsGridRow}>
-                {row.map((snippet) => (
-                  <SnippetGridCard key={snippet.id} snippet={snippet} readOnly />
-                ))}
-              </View>
-            ));
-          })()}
-        </View>
-      </ScrollView>
+          </View>
+        </TouchableOpacity>
+      )}
 
       <Modal
         visible={artistsInCommonModalOpen}
@@ -340,9 +345,23 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   content: { paddingHorizontal: 24, paddingBottom: 40 },
-  artistsInCommonRow: {
-    alignSelf: "flex-start",
-    marginBottom: 16,
+  contentWithFloatingBar: { paddingBottom: 100 },
+  artistsInCommonFloating: {
+    position: "absolute",
+    bottom: 32,
+    left: 24,
+    right: 24,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  artistsInCommonContainer: {
+    backgroundColor: "#282828",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#383838",
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    width: "100%",
   },
   artistsInCommon: {
     flexDirection: "row",
