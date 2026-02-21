@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
@@ -12,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ThemedText";
+import { ThemedTextInput } from "@/components/ThemedTextInput";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
@@ -142,7 +142,7 @@ export default function LoginScreen() {
 
           {/* Fields */}
           {mode === "signup" && (
-            <TextInput
+            <ThemedTextInput
               style={styles.input}
               placeholder="Full name"
               placeholderTextColor="rgba(255,255,255,0.4)"
@@ -152,7 +152,7 @@ export default function LoginScreen() {
             />
           )}
 
-          <TextInput
+          <ThemedTextInput
             style={styles.input}
             placeholder="Email"
             placeholderTextColor="rgba(255,255,255,0.4)"
@@ -164,7 +164,7 @@ export default function LoginScreen() {
           />
 
           <View style={styles.passwordContainer}>
-            <TextInput
+            <ThemedTextInput
               style={styles.passwordInput}
               placeholder="Password"
               placeholderTextColor="rgba(255,255,255,0.4)"
@@ -187,7 +187,7 @@ export default function LoginScreen() {
 
           {mode === "signup" && (
             <View style={styles.passwordContainer}>
-              <TextInput
+              <ThemedTextInput
                 style={styles.passwordInput}
                 placeholder="Confirm Password"
                 placeholderTextColor="rgba(255,255,255,0.4)"

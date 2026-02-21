@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   Alert,
@@ -9,6 +8,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ThemedText";
+import { ThemedTextInput } from "@/components/ThemedTextInput";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 
@@ -43,7 +43,7 @@ export default function RecoverScreen() {
         <ThemedText style={styles.subtitle}>
           Enter your email and we'll send you a reset link.
         </ThemedText>
-        <TextInput
+        <ThemedTextInput
           style={styles.input}
           placeholder="Email"
           placeholderTextColor="rgba(255,255,255,0.4)"

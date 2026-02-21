@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  TextInput,
   TouchableOpacity,
   Modal,
   StyleSheet,
@@ -12,6 +11,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ThemedText } from "@/components/ThemedText";
+import { ThemedTextInput } from "@/components/ThemedTextInput";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -154,7 +154,7 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
                     )}
                   </View>
                 </View>
-                <TextInput
+                <ThemedTextInput
                   style={[styles.input, { backgroundColor: colors.input, color: colors.text }]}
                   value={draft}
                   onChangeText={setDraft}

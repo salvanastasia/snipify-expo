@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
   View,
-  TextInput,
   TouchableOpacity,
   FlatList,
   Image,
@@ -14,6 +13,7 @@ import {
 } from "react-native";
 import { BlurView } from "expo-blur";
 import { ThemedText } from "./ThemedText";
+import { ThemedTextInput } from "./ThemedTextInput";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -303,7 +303,7 @@ export function SearchBar({ onSnippetSaved }: Props) {
           <BlurView intensity={BLUR_INTENSITY} tint="dark" style={StyleSheet.absoluteFill} />
           <View style={styles.inputRow}>
             <Ionicons name="search" size={18} color="rgba(255,255,255,0.5)" style={styles.searchIcon} />
-            <TextInput
+            <ThemedTextInput
               style={styles.input}
               placeholder={`Search for ${searchMode === "songs" ? "a song" : "friends"}...`}
               placeholderTextColor="rgba(255,255,255,0.4)"
