@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import { getLyricSnippets } from "@/lib/storage";
 import { ThemedText } from "./ThemedText";
@@ -70,7 +71,7 @@ export function TopArtists() {
   }
 
   return (
-    <View>
+    <View style={styles.root} collapsable={false}>
       <View style={styles.headerRow}>
         <ThemedText style={[styles.title, { color: colors.text }]}>Top artists</ThemedText>
         <TouchableOpacity onPress={() => setShowAll(true)} accessibilityLabel="Show all artists" accessibilityRole="button">
@@ -78,15 +79,17 @@ export function TopArtists() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {artists.slice(0, 10).map((artist) => (
-          <ArtistItem key={artist.name} artist={artist} colors={colors} />
-        ))}
-      </ScrollView>
+      <View style={styles.scrollWrapper}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {artists.slice(0, 10).map((artist) => (
+            <ArtistItem key={artist.name} artist={artist} colors={colors} />
+          ))}
+        </ScrollView>
+      </View>
 
       <Modal visible={showAll} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setShowAll(false)}>
         <View style={[styles.modal, { backgroundColor: colors.card }]}>
@@ -141,11 +144,21 @@ function ArtistItem({ artist, colors }: { artist: Artist; colors: { text: string
 }
 
 const styles = StyleSheet.create({
+  root: { overflow: "visible" },
   title: { fontSize: 28, fontWeight: "700", marginBottom: 16 },
   headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 },
   showAll: { fontSize: 14 },
   emptyText: { fontSize: 15 },
-  scrollContent: { gap: 20, paddingRight: 16 },
+  scrollWrapper: {
+    marginHorizontal: -24,
+    width: Dimensions.get("window").width,
+    overflow: "visible",
+  },
+  scrollContent: {
+    gap: 20,
+    paddingLeft: 24,
+    paddingRight: 24,
+  },
   artistItem: { alignItems: "center", width: 120, gap: 8 },
   artistImage: { width: 120, height: 120, borderRadius: 60 },
   artistName: { fontSize: 14, fontWeight: "600", textAlign: "center" },

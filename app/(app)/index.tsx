@@ -100,7 +100,7 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          <View style={styles.section}>
+          <View style={[styles.section, styles.sectionTopArtists]}>
             <TopArtists key={`artists-${refreshKey}`} />
           </View>
         </ScrollView>
@@ -147,6 +147,7 @@ const styles = StyleSheet.create({
   profileSetupBtnText: { fontSize: 15, fontWeight: "600" },
   profileLabel: { fontSize: 12 },
   section: { paddingHorizontal: 24, marginTop: 16 },
+  sectionTopArtists: { overflow: "visible" },
   snippetsSwiperWrapper: { marginHorizontal: -24 },
   sectionTitle: {
     fontSize: 28,
