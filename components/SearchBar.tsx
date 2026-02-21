@@ -24,10 +24,10 @@ import { getColorsFromImageUrl } from "@/lib/albumArtColors";
 import { LyricsBottomSheet } from "./LyricsBottomSheet";
 
 /** Fascia bassa quando tastiera chiusa (solo blur + gradient sopra la search bar) */
-const STRIP_HEIGHT_CLOSED = 64;
+const STRIP_HEIGHT_CLOSED = 120;
 /** Altezza overlay sopra tastiera quando aperta (copre search bar + risultati) */
 const OVERLAY_HEIGHT_KEYBOARD_OPEN = 56 + 400 + 16;
-const BLUR_INTENSITY = 24;
+const BLUR_INTENSITY = 48;
 
 const RECENT_SEARCHES_KEY = "recent-searches";
 const MAX_RECENT = 6;
