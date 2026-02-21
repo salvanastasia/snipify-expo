@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
   contentWithFloatingBar: { paddingBottom: 100 },
   artistsInCommonFloating: {
     position: "absolute",
-    bottom: 32,
+    bottom: 42,
     left: 24,
     right: 24,
     alignItems: "center",
@@ -356,12 +356,11 @@ const styles = StyleSheet.create({
   },
   artistsInCommonContainer: {
     backgroundColor: "#282828",
-    borderRadius: 12,
+    borderRadius: 32,
     borderWidth: 1,
     borderColor: "#383838",
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    width: "100%",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   artistsInCommon: {
     flexDirection: "row",
