@@ -2,8 +2,10 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const THEME_STORAGE_KEY = "app_theme";
+const FONT_STORAGE_KEY = "profile_font";
 
 export type ThemeId = "default" | "cream";
+export type FontId = "default" | "Doto";
 
 export type ThemeColors = {
   background: string;
@@ -51,16 +53,27 @@ type ThemeContextType = {
   theme: ThemeId;
   colors: ThemeColors;
   setTheme: (id: ThemeId) => void;
+  font: FontId;
+  setFont: (id: FontId) => void;
+  defaultFontFamily: string;
+  defaultFontFamilyBold: string;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>("default");
+  const [font, setFontState] = useState<FontId>("default");
 
   useEffect(() => {
     AsyncStorage.getItem(THEME_STORAGE_KEY).then((stored) => {
       if (stored === "cream" || stored === "default") setThemeState(stored);
+    });
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.getItem(FONT_STORAGE_KEY).then((stored) => {
+      if (stored === "Doto" || stored === "default") setFontState(stored);
     });
   }, []);
 
@@ -69,10 +82,27 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.setItem(THEME_STORAGE_KEY, id).catch(() => {});
   };
 
+  const setFont = (id: FontId) => {
+    setFontState(id);
+    AsyncStorage.setItem(FONT_STORAGE_KEY, id).catch(() => {});
+  };
+
   const colors = THEMES[theme];
+  const defaultFontFamily = font === "Doto" ? "Doto" : "MDNichrome";
+  const defaultFontFamilyBold = font === "Doto" ? "Doto" : "MDNichromeBold";
 
   return (
-    <ThemeContext.Provider value={{ theme, colors, setTheme }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        colors,
+        setTheme,
+        font,
+        setFont,
+        defaultFontFamily,
+        defaultFontFamilyBold,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

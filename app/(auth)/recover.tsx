@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -9,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ThemedText } from "@/components/ThemedText";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 
@@ -37,12 +37,12 @@ export default function RecoverScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-          <Text style={styles.backText}>← Back</Text>
+          <ThemedText style={styles.backText}>← Back</ThemedText>
         </TouchableOpacity>
-        <Text style={styles.title}>Recover Password</Text>
-        <Text style={styles.subtitle}>
+        <ThemedText style={styles.title}>Recover Password</ThemedText>
+        <ThemedText style={styles.subtitle}>
           Enter your email and we'll send you a reset link.
-        </Text>
+        </ThemedText>
         <TextInput
           style={styles.input}
           placeholder="Email"
@@ -56,7 +56,7 @@ export default function RecoverScreen() {
           {loading ? (
             <ActivityIndicator color="#000" />
           ) : (
-            <Text style={styles.buttonText}>Send Reset Link</Text>
+            <ThemedText style={styles.buttonText}>Send Reset Link</ThemedText>
           )}
         </TouchableOpacity>
       </View>

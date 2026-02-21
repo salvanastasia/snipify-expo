@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  Text,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   Image,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ThemedText } from "@/components/ThemedText";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "@/lib/supabase";
@@ -175,27 +175,27 @@ export default function UserProfileScreen() {
               <Ionicons name="person" size={40} color="rgba(255,255,255,0.4)" />
             </View>
           )}
-          <Text style={styles.name}>{profile?.full_name || "Unknown User"}</Text>
-          <Text style={styles.followers}>
+          <ThemedText style={styles.name}>{profile?.full_name || "Unknown User"}</ThemedText>
+          <ThemedText style={styles.followers}>
             {followersCount} {followersCount === 1 ? "follower" : "followers"}
-          </Text>
+          </ThemedText>
 
           {!isOwnProfile && user && (
             <TouchableOpacity
               style={[styles.followButton, isFollowing && styles.followingButton]}
               onPress={toggleFollow}
             >
-              <Text style={[styles.followText, isFollowing && styles.followingText]}>
+              <ThemedText style={[styles.followText, isFollowing && styles.followingText]}>
                 {isFollowing ? "Following" : "Follow"}
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
           )}
         </View>
 
         {/* Snippets (grid by default for public profile) */}
-        <Text style={styles.sectionTitle}>
+        <ThemedText style={styles.sectionTitle}>
           {snippets.length} {snippets.length === 1 ? "Snippet" : "Snippets"}
-        </Text>
+        </ThemedText>
         <View style={styles.snippetsGrid}>
           {(() => {
             const rows: LyricSnippet[][] = [];

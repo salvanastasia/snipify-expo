@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -12,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { ThemedText } from "@/components/ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
@@ -116,9 +116,9 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={styles.title}>
+          <ThemedText style={styles.title}>
             {mode === "login" ? "Login to Snipify" : "Welcome to Snipify"}
-          </Text>
+          </ThemedText>
 
           {/* Tab switcher */}
           <View style={styles.tabContainer}>
@@ -126,17 +126,17 @@ export default function LoginScreen() {
               style={[styles.tab, mode === "signup" && styles.tabActive]}
               onPress={() => setMode("signup")}
             >
-              <Text style={[styles.tabText, mode === "signup" && styles.tabTextActive]}>
+              <ThemedText style={[styles.tabText, mode === "signup" && styles.tabTextActive]}>
                 Sign up
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.tab, mode === "login" && styles.tabActive]}
               onPress={() => setMode("login")}
             >
-              <Text style={[styles.tabText, mode === "login" && styles.tabTextActive]}>
+              <ThemedText style={[styles.tabText, mode === "login" && styles.tabTextActive]}>
                 Login
-              </Text>
+              </ThemedText>
             </TouchableOpacity>
           </View>
 
@@ -217,17 +217,17 @@ export default function LoginScreen() {
             {loading ? (
               <ActivityIndicator color="#000" />
             ) : (
-              <Text style={styles.submitText}>
+              <ThemedText style={styles.submitText}>
                 {mode === "login" ? "Login" : "Register"}
-              </Text>
+              </ThemedText>
             )}
           </TouchableOpacity>
 
           {mode === "login" && (
             <View style={styles.recoverContainer}>
-              <Text style={styles.recoverText}>Forgot your password? </Text>
+              <ThemedText style={styles.recoverText}>Forgot your password? </ThemedText>
               <TouchableOpacity onPress={handleRecover}>
-                <Text style={styles.recoverLink}>Recover</Text>
+                <ThemedText style={styles.recoverLink}>Recover</ThemedText>
               </TouchableOpacity>
             </View>
           )}

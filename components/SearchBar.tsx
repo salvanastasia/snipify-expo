@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   FlatList,
@@ -14,6 +13,7 @@ import {
   Dimensions,
 } from "react-native";
 import { BlurView } from "expo-blur";
+import { ThemedText } from "./ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -272,12 +272,12 @@ export function SearchBar({ onSnippetSaved }: Props) {
             {loading ? (
               <ActivityIndicator color="#fff" style={{ padding: 16 }} />
             ) : error && results.length === 0 ? (
-              <Text style={styles.errorText}>{error}</Text>
+              <ThemedText style={styles.errorText}>{error}</ThemedText>
             ) : showRecent && results.length === 0 ? (
               <>
                 <View style={styles.recentHeader}>
                   <Ionicons name="time-outline" size={14} color="rgba(255,255,255,0.4)" />
-                  <Text style={styles.recentLabel}>Recent searches</Text>
+                  <ThemedText style={styles.recentLabel}>Recent searches</ThemedText>
                 </View>
                 <FlatList
                   data={recentSearches}
@@ -320,7 +320,7 @@ export function SearchBar({ onSnippetSaved }: Props) {
                 setIsOpen(false);
               }}
             >
-              <Text style={styles.modeText}>{searchMode === "songs" ? "Songs" : "Friends"}</Text>
+              <ThemedText style={styles.modeText}>{searchMode === "songs" ? "Songs" : "Friends"}</ThemedText>
             </TouchableOpacity>
           </View>
         </View>
@@ -353,10 +353,10 @@ function SongRow({ song, onPress }: { song: any; onPress: () => void }) {
         defaultSource={require("../assets/placeholder.png")}
       />
       <View style={styles.songInfo}>
-        <Text style={styles.songTitle} numberOfLines={1}>{song.title}</Text>
-        <Text style={styles.songArtist} numberOfLines={1}>
+        <ThemedText style={styles.songTitle} numberOfLines={1}>{song.title}</ThemedText>
+        <ThemedText style={styles.songArtist} numberOfLines={1}>
           {song.isUser ? "User" : song.artist_names}
-        </Text>
+        </ThemedText>
       </View>
     </TouchableOpacity>
   );
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     gap: 12,
   },
-  songArt: { width: 48, height: 48, borderRadius: 6, backgroundColor: "#383838" },
+  songArt: { width: 38, height: 38, borderRadius: 10, backgroundColor: "#383838" },
   songInfo: { flex: 1 },
   songTitle: { color: "#fff", fontSize: 15, fontWeight: "500" },
   songArtist: { color: "rgba(255,255,255,0.6)", fontSize: 13, marginTop: 2 },

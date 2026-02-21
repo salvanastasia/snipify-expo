@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   Image,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { ThemedText } from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { LyricSnippet } from "@/lib/storage";
 import { LyricSnippetExpandedModal } from "./LyricSnippetExpandedModal";
@@ -58,17 +58,17 @@ export function SnippetGridCard({ snippet, readOnly = false }: Props) {
               <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
             ) : (
               <View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-                <Ionicons name="musical-notes" size={16} color="rgba(255,255,255,0.4)" />
+                <Ionicons name="musical-notes" size={12} color="rgba(255,255,255,0.4)" />
               </View>
             )}
             <View style={styles.songInfo}>
-              <Text style={styles.songTitle} numberOfLines={1}>
+              <ThemedText style={styles.songTitle} numberOfLines={1}>
                 {snippet.song_title}
-              </Text>
-              <Text style={styles.artistName} numberOfLines={1}>
+              </ThemedText>
+              <ThemedText style={styles.artistName} numberOfLines={1}>
                 {snippet.artist_name}
-              </Text>
-            </View>
+</ThemedText>
+          </View>
           </View>
         </View>
         </TouchableOpacity>
@@ -143,9 +143,9 @@ const styles = StyleSheet.create({
     paddingRight: 24,
   },
   albumArt: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 30,
+    height: 30,
+    borderRadius: 8,
     backgroundColor: "rgba(0,0,0,0.2)",
   },
   albumArtPlaceholder: {

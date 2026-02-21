@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  Text,
   Image,
   ScrollView,
   StyleSheet,
@@ -11,6 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { getLyricSnippets } from "@/lib/storage";
+import { ThemedText } from "./ThemedText";
 import { useTheme } from "@/lib/theme-context";
 
 interface Artist {
@@ -54,7 +54,7 @@ export function TopArtists() {
   if (loading) {
     return (
       <View>
-        <Text style={[styles.title, { color: colors.text }]}>Top artists</Text>
+        <ThemedText style={[styles.title, { color: colors.text }]}>Top artists</ThemedText>
         <ActivityIndicator color={colors.tint} style={{ marginTop: 16 }} />
       </View>
     );
@@ -63,8 +63,8 @@ export function TopArtists() {
   if (artists.length === 0) {
     return (
       <View>
-        <Text style={[styles.title, { color: colors.text }]}>Top artists</Text>
-        <Text style={[styles.emptyText, { color: colors.textMuted }]}>Save some lyrics to see your top artists!</Text>
+        <ThemedText style={[styles.title, { color: colors.text }]}>Top artists</ThemedText>
+        <ThemedText style={[styles.emptyText, { color: colors.textMuted }]}>Save some lyrics to see your top artists!</ThemedText>
       </View>
     );
   }
@@ -72,9 +72,9 @@ export function TopArtists() {
   return (
     <View>
       <View style={styles.headerRow}>
-        <Text style={[styles.title, { color: colors.text }]}>Top artists</Text>
+        <ThemedText style={[styles.title, { color: colors.text }]}>Top artists</ThemedText>
         <TouchableOpacity onPress={() => setShowAll(true)} accessibilityLabel="Show all artists" accessibilityRole="button">
-          <Text style={[styles.showAll, { color: colors.textMuted }]}>Show all</Text>
+          <ThemedText style={[styles.showAll, { color: colors.textMuted }]}>Show all</ThemedText>
         </TouchableOpacity>
       </View>
 
@@ -92,8 +92,8 @@ export function TopArtists() {
         <View style={[styles.modal, { backgroundColor: colors.card }]}>
           <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
             <View>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>All Artists</Text>
-              <Text style={[styles.modalSubtitle, { color: colors.textMuted }]}>{artists.length} artists</Text>
+              <ThemedText style={[styles.modalTitle, { color: colors.text }]}>All Artists</ThemedText>
+              <ThemedText style={[styles.modalSubtitle, { color: colors.textMuted }]}>{artists.length} artists</ThemedText>
             </View>
           </View>
 
@@ -108,10 +108,10 @@ export function TopArtists() {
                   style={[styles.modalAvatar, { backgroundColor: colors.input }]}
                 />
                 <View style={styles.modalInfo}>
-                  <Text style={[styles.modalArtistName, { color: colors.text }]}>{item.name}</Text>
-                  <Text style={[styles.modalArtistCount, { color: colors.textMuted }]}>
+                  <ThemedText style={[styles.modalArtistName, { color: colors.text }]}>{item.name}</ThemedText>
+                  <ThemedText style={[styles.modalArtistCount, { color: colors.textMuted }]}>
                     {item.count} {item.count === 1 ? "snippet" : "snippets"}
-                  </Text>
+                  </ThemedText>
                 </View>
               </View>
             )}
@@ -119,7 +119,7 @@ export function TopArtists() {
 
           <View style={[styles.modalFooter, { borderTopColor: colors.border }]}>
             <TouchableOpacity style={styles.closeButton} onPress={() => setShowAll(false)} accessibilityLabel="Close" accessibilityRole="button">
-              <Text style={styles.closeText}>Close</Text>
+              <ThemedText style={styles.closeText}>Close</ThemedText>
             </TouchableOpacity>
           </View>
         </View>
@@ -132,10 +132,10 @@ function ArtistItem({ artist, colors }: { artist: Artist; colors: { text: string
   return (
     <View style={styles.artistItem}>
       <Image source={{ uri: artist.imageUrl || undefined }} style={[styles.artistImage, { backgroundColor: colors.input }]} />
-      <Text style={[styles.artistName, { color: colors.text }]} numberOfLines={1}>{artist.name}</Text>
-      <Text style={[styles.artistCount, { color: colors.textMuted }]}>
+      <ThemedText style={[styles.artistName, { color: colors.text }]} numberOfLines={1}>{artist.name}</ThemedText>
+      <ThemedText style={[styles.artistCount, { color: colors.textMuted }]}>
         {artist.count} {artist.count === 1 ? "snippet" : "snippets"}
-      </Text>
+      </ThemedText>
     </View>
   );
 }

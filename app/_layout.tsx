@@ -11,6 +11,8 @@ import { ThemeProvider, useTheme } from "@/lib/theme-context";
 SplashScreen.preventAutoHideAsync();
 
 const DOTO_FONT = require("@/assets/fonts/Doto-VariableFont_ROND,wght.ttf");
+const MD_NICHROME_REGULAR = require("@/assets/fonts/MDNichromeTest-Regular.otf");
+const MD_NICHROME_BOLD = require("@/assets/fonts/MDNichromeTest-Bold.otf");
 
 function RootLayoutNav() {
   const { user, loading } = useAuth();
@@ -55,7 +57,11 @@ function ThemeRoot() {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({ Doto: DOTO_FONT });
+  const [fontsLoaded] = useFonts({
+    Doto: DOTO_FONT,
+    MDNichrome: MD_NICHROME_REGULAR,
+    MDNichromeBold: MD_NICHROME_BOLD,
+  });
 
   useEffect(() => {
     if (fontsLoaded) {

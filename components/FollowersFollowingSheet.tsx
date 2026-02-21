@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  Text,
   Modal,
   TouchableOpacity,
   FlatList,
@@ -9,6 +8,7 @@ import {
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ThemedText } from "./ThemedText";
 import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 
@@ -102,7 +102,7 @@ export function FollowersFollowingSheet({ isOpen, onClose, userId, type }: Props
           <Ionicons name="person" size={20} color="rgba(255,255,255,0.4)" />
         </View>
       )}
-      <Text style={styles.userName}>{item.full_name || "Unknown User"}</Text>
+      <ThemedText style={styles.userName}>{item.full_name || "Unknown User"}</ThemedText>
     </TouchableOpacity>
   );
 
@@ -128,9 +128,9 @@ export function FollowersFollowingSheet({ isOpen, onClose, userId, type }: Props
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>
+          <ThemedText style={styles.headerTitle}>
             {type === "followers" ? "Followers" : "Following"}
-          </Text>
+          </ThemedText>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Ionicons name="close" size={22} color="rgba(255,255,255,0.6)" />
           </TouchableOpacity>
@@ -143,13 +143,13 @@ export function FollowersFollowingSheet({ isOpen, onClose, userId, type }: Props
           </View>
         ) : error ? (
           <View style={styles.centered}>
-            <Text style={styles.errorText}>{error}</Text>
+            <ThemedText style={styles.errorText}>{error}</ThemedText>
           </View>
         ) : profiles.length === 0 ? (
           <View style={styles.centered}>
-            <Text style={styles.emptyText}>
+            <ThemedText style={styles.emptyText}>
               No {type === "followers" ? "followers" : "following"} yet
-            </Text>
+            </ThemedText>
           </View>
         ) : (
           <FlatList

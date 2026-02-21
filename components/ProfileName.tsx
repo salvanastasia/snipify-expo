@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  Text,
   TextInput,
   TouchableOpacity,
   Modal,
@@ -12,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ThemedText } from "@/components/ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,12 +19,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
-import type { ThemeId } from "@/lib/theme-context";
+import type { ThemeId, FontId } from "@/lib/theme-context";
 import { THEME_SWATCH_COLORS } from "@/lib/theme-context";
 
-const FONT_STORAGE_KEY = "profile_font";
 export const LAYOUT_STORAGE_KEY = "snippets_layout";
-type FontChoice = "default" | "Doto";
 export type SnippetsLayoutId = "list" | "grid";
 
 const THEME_OPTIONS: { id: ThemeId; label: string }[] = [
@@ -40,12 +38,11 @@ interface Props {
 
 export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: Props) {
   const { signOut } = useAuth();
-  const { theme, colors, setTheme } = useTheme();
+  const { theme, colors, setTheme, font, setFont, defaultFontFamily } = useTheme();
   const insets = useSafeAreaInsets();
   const [name, setName] = useState("");
   const [draft, setDraft] = useState("");
   const [saving, setSaving] = useState(false);
-  const [font, setFont] = useState<FontChoice>("default");
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -56,15 +53,6 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
     load();
   }, [userId]);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const fontStored = await AsyncStorage.getItem(FONT_STORAGE_KEY);
-        if (fontStored === "Doto" || fontStored === "default") setFont(fontStored);
-      } catch {}
-    })();
-  }, []);
-
   const load = async () => {
     const { data } = await supabase
       .from("profiles")
@@ -72,11 +60,6 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
       .eq("id", userId)
       .single();
     if (data?.full_name) setName(data.full_name);
-  };
-
-  const setFontAndPersist = (value: FontChoice) => {
-    setFont(value);
-    AsyncStorage.setItem(FONT_STORAGE_KEY, value).catch(() => {});
   };
 
   const handleCancel = () => {
@@ -117,9 +100,9 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
   return (
     <>
       <View style={styles.nameRow}>
-        <Text style={[styles.name, { color: colors.text }, font === "Doto" && { fontFamily: "Doto" }]}>
+        <ThemedText style={[styles.name, { color: colors.text }]}>
           {name || "Add your name"}
-        </Text>
+        </ThemedText>
       </View>
 
       <Modal visible={profileSetupOpen} transparent animationType="slide" onRequestClose={handleCancel}>
@@ -148,9 +131,9 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
                 ]}
               >
                 <View style={styles.dialogHeader}>
-                  <Text style={[styles.dialogTitle, { color: colors.text }]} accessibilityRole="header">
-                    Profile Setup
-                  </Text>
+                  <ThemedText style={[styles.dialogTitle, { color: colors.text }]} accessibilityRole="header">
+                Profile Setup
+              </ThemedText>
                   <View style={styles.menuAnchor}>
                     <TouchableOpacity
                       style={styles.menuTrigger}
@@ -165,7 +148,7 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
                           style={styles.dropdownItem}
                           onPress={handleLogout}
                         >
-                          <Text style={[styles.dropdownItemText, { color: colors.text }]}>Logout</Text>
+                          <ThemedText style={[styles.dropdownItemText, { color: colors.text }]}>Logout</ThemedText>
                         </TouchableOpacity>
                       </View>
                     )}
@@ -180,7 +163,7 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
                   accessibilityLabel="Profile name"
                 />
                 <View style={styles.themeRow}>
-                  <Text style={[styles.sectionLabel, { color: colors.textMuted }]}>Theme</Text>
+                  <ThemedText style={[styles.sectionLabel, { color: colors.textMuted }]}>Theme</ThemedText>
                   <View style={styles.themeSwatches}>
                     {THEME_OPTIONS.map((opt) => {
                       const selected = theme === opt.id;
@@ -207,7 +190,7 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
                   </View>
                 </View>
                 <View style={styles.fontRow}>
-                  <Text style={[styles.sectionLabel, { color: colors.textMuted }]}>Font</Text>
+                  <ThemedText style={[styles.sectionLabel, { color: colors.textMuted }]}>Font</ThemedText>
                   <View style={styles.fontSwitcher}>
                     <TouchableOpacity
                       style={[
@@ -215,14 +198,14 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
                         { backgroundColor: font === "default" ? (isCream ? colors.text : "#fff") : colors.input },
                         font === "default" && styles.fontAaOptionSelected,
                       ]}
-                      onPress={() => setFontAndPersist("default")}
+                      onPress={() => setFont("default")}
                       accessibilityLabel="Default font"
                       accessibilityRole="button"
                       accessibilityState={{ selected: font === "default" }}
                     >
-                      <Text style={[styles.fontAaText, font === "default" ? (isCream ? { color: colors.background } : styles.fontOptionTextActive) : { color: colors.text }]}>
+                      <ThemedText style={[styles.fontAaText, font === "default" ? (isCream ? { color: colors.background } : styles.fontOptionTextActive) : { color: colors.text }]}>
                         Aa
-                      </Text>
+                      </ThemedText>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[
@@ -230,26 +213,26 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
                         { backgroundColor: font === "Doto" ? (isCream ? colors.text : "#fff") : colors.input },
                         font === "Doto" && styles.fontAaOptionSelected,
                       ]}
-                      onPress={() => setFontAndPersist("Doto")}
+                      onPress={() => setFont("Doto")}
                       accessibilityLabel="Doto font"
                       accessibilityRole="button"
                       accessibilityState={{ selected: font === "Doto" }}
                     >
-                      <Text style={[styles.fontAaText, font === "Doto" ? (isCream ? { color: colors.background } : styles.fontOptionTextActive) : { color: colors.text }, { fontFamily: "Doto" }]}>
+                      <ThemedText style={[styles.fontAaText, font === "Doto" ? (isCream ? { color: colors.background } : styles.fontOptionTextActive) : { color: colors.text }, { fontFamily: "Doto" }]}>
                         Aa
-                      </Text>
+                      </ThemedText>
                     </TouchableOpacity>
                   </View>
                 </View>
                 <View style={styles.buttons}>
                   <TouchableOpacity onPress={handleCancel} style={[styles.cancelBtn, { backgroundColor: colors.input }]}>
-                    <Text style={[styles.cancelText, { color: colors.textMuted }]}>Cancel</Text>
+                    <ThemedText style={[styles.cancelText, { color: colors.textMuted }]}>Cancel</ThemedText>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={handleSave} style={styles.saveBtn} disabled={saving}>
                     {saving ? (
                       <ActivityIndicator color="#000" />
                     ) : (
-                      <Text style={styles.saveText}>Save</Text>
+                      <ThemedText style={styles.saveText}>Save</ThemedText>
                     )}
                   </TouchableOpacity>
                 </View>

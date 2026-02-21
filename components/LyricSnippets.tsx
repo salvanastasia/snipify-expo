@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   View,
-  Text,
   ScrollView,
   ActivityIndicator,
   StyleSheet,
@@ -10,6 +9,7 @@ import {
   NativeScrollEvent,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ThemedText } from "./ThemedText";
 import { getLyricSnippets, deleteLyricSnippet, LyricSnippet, updateSnippetColor } from "@/lib/storage";
 import { getColorsFromImageUrl } from "@/lib/albumArtColors";
 import { useTheme } from "@/lib/theme-context";
@@ -110,14 +110,14 @@ export function LyricSnippets() {
   }
 
   if (error) {
-    return <Text style={styles.errorText}>{error}</Text>;
+    return <ThemedText style={styles.errorText}>{error}</ThemedText>;
   }
 
   if (snippets.length === 0) {
     return (
-      <Text style={[styles.emptyText, { color: colors.textMuted }]}>
+      <ThemedText style={[styles.emptyText, { color: colors.textMuted }]}>
         Search for a song above to save your first snippet!
-      </Text>
+      </ThemedText>
     );
   }
 

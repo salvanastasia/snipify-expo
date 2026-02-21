@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { supabase } from "@/lib/supabase";
+import { ThemedText } from "./ThemedText";
 import { useTheme } from "@/lib/theme-context";
 import { FollowersFollowingSheet } from "./FollowersFollowingSheet";
 
@@ -86,8 +87,8 @@ function Stat({
 }) {
   const content = (
     <View style={styles.stat}>
-      <Text style={[styles.value, { color: colors.text }]}>{value}</Text>
-      <Text style={[styles.label, { color: colors.textMuted }]}>{label}</Text>
+      <ThemedText style={[styles.value, { color: colors.text }]}>{value}</ThemedText>
+      <ThemedText style={[styles.label, { color: colors.textMuted }]}>{label}</ThemedText>
     </View>
   );
 

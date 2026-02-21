@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import {
   View,
-  Text,
   Image,
   TouchableOpacity,
   StyleSheet,
   Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { ThemedText } from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { LyricSnippet } from "@/lib/storage";
 import { LyricsBottomSheet } from "./LyricsBottomSheet";
@@ -55,9 +55,9 @@ export function SnippetCard({ snippet, readOnly = false, onDelete, isLast }: Pro
 
         <View style={styles.cardContent}>
           {/* Top: lyrics only */}
-          <Text style={styles.lyrics} numberOfLines={4}>
+          <ThemedText style={styles.lyrics} numberOfLines={4}>
             {snippet.lyrics}
-          </Text>
+          </ThemedText>
 
           {/* Bottom: album art (left) + song/artist (middle) */}
           <View style={styles.footer}>
@@ -65,12 +65,12 @@ export function SnippetCard({ snippet, readOnly = false, onDelete, isLast }: Pro
               <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
             ) : (
               <View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-                <Ionicons name="musical-notes" size={20} color="rgba(255,255,255,0.4)" />
+                <Ionicons name="musical-notes" size={16} color="rgba(255,255,255,0.4)" />
               </View>
             )}
             <View style={styles.songInfo}>
-              <Text style={styles.songTitle} numberOfLines={1}>{snippet.song_title}</Text>
-              <Text style={styles.artistName} numberOfLines={1}>{snippet.artist_name}</Text>
+              <ThemedText style={styles.songTitle} numberOfLines={1}>{snippet.song_title}</ThemedText>
+              <ThemedText style={styles.artistName} numberOfLines={1}>{snippet.artist_name}</ThemedText>
             </View>
           </View>
 
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: "rgba(255,255,255,0.95)",
     fontSize: 18,
-    fontWeight: "500",
+    fontWeight: "700",
     lineHeight: 28,
     paddingBottom: 24,
   },
@@ -127,9 +127,9 @@ const styles = StyleSheet.create({
     paddingRight: 36,
   },
   albumArt: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 38,
+    height: 38,
+    borderRadius: 10,
     backgroundColor: "rgba(0,0,0,0.2)",
   },
   albumArtPlaceholder: {

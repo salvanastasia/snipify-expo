@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
   View,
-  Text,
   Modal,
   TouchableOpacity,
   ScrollView,
@@ -11,6 +10,7 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { ThemedText } from "./ThemedText";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -143,8 +143,8 @@ export function LyricsBottomSheet({ isOpen, onClose, song, onSave, initialLyrics
             style={styles.albumArt}
           />
           <View style={styles.songInfo}>
-            <Text style={styles.songTitle} numberOfLines={1}>{song.title}</Text>
-            <Text style={styles.artistName} numberOfLines={1}>{song.artist_names}</Text>
+            <ThemedText style={styles.songTitle} numberOfLines={1}>{song.title}</ThemedText>
+            <ThemedText style={styles.artistName} numberOfLines={1}>{song.artist_names}</ThemedText>
           </View>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Ionicons name="close" size={22} color="rgba(255,255,255,0.6)" />
@@ -158,7 +158,7 @@ export function LyricsBottomSheet({ isOpen, onClose, song, onSave, initialLyrics
           </View>
         ) : error ? (
           <View style={styles.centered}>
-            <Text style={styles.errorText}>{error}</Text>
+            <ThemedText style={styles.errorText}>{error}</ThemedText>
           </View>
         ) : (
           <ScrollView
@@ -167,7 +167,7 @@ export function LyricsBottomSheet({ isOpen, onClose, song, onSave, initialLyrics
             showsVerticalScrollIndicator={false}
           >
             {!readOnly && selectedLines.size === 0 && (
-              <Text style={styles.hint}>Tap lines to select your snippet</Text>
+              <ThemedText style={styles.hint}>Tap lines to select your snippet</ThemedText>
             )}
             {lyrics.map((line, index) => {
               const isSelected = selectedLines.has(index);
@@ -179,9 +179,9 @@ export function LyricsBottomSheet({ isOpen, onClose, song, onSave, initialLyrics
                   activeOpacity={readOnly ? 1 : 0.7}
                 >
                   {isSelected && <View style={styles.selectedBar} />}
-                  <Text style={[styles.lyricText, isSelected && styles.lyricTextSelected]}>
+                  <ThemedText style={[styles.lyricText, isSelected && styles.lyricTextSelected]}>
                     {line}
-                  </Text>
+                  </ThemedText>
                 </TouchableOpacity>
               );
             })}
@@ -199,9 +199,9 @@ export function LyricsBottomSheet({ isOpen, onClose, song, onSave, initialLyrics
               {saving ? (
                 <ActivityIndicator color="#000" />
               ) : (
-                <Text style={styles.saveText}>
+                <ThemedText style={styles.saveText}>
                   Save {selectedLines.size > 0 ? `${selectedLines.size} line${selectedLines.size > 1 ? "s" : ""}` : "snippet"}
-                </Text>
+                </ThemedText>
               )}
             </TouchableOpacity>
           </View>
@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "rgba(255,255,255,0.1)",
   },
-  albumArt: { width: 48, height: 48, borderRadius: 6 },
+  albumArt: { width: 38, height: 38, borderRadius: 10 },
   songInfo: { flex: 1 },
   songTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
   artistName: { color: "rgba(255,255,255,0.6)", fontSize: 13, marginTop: 2 },
@@ -245,15 +245,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
   },
-  lyricLineSelected: { backgroundColor: "rgba(255,255,255,0.1)" },
+  lyricLineSelected: { backgroundColor: "rgba(255,255,255,0.18)" },
   selectedBar: {
-    width: 3,
+    width: 4,
     alignSelf: "stretch",
     backgroundColor: "#fff",
     borderRadius: 2,
   },
-  lyricText: { color: "rgba(255,255,255,0.7)", fontSize: 17, lineHeight: 26, flex: 1 },
-  lyricTextSelected: { color: "#fff", fontWeight: "500" },
+  lyricText: { color: "rgba(255,255,255,0.7)", fontSize: 17, lineHeight: 26, flex: 1, fontWeight: "700" },
+  lyricTextSelected: { color: "#fff", fontWeight: "700" },
   footer: {
     padding: 16,
     borderTopWidth: 1,

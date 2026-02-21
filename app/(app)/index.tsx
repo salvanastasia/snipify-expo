@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from "react";
 import {
   View,
-  Text,
   ScrollView,
   StyleSheet,
   RefreshControl,
   TouchableOpacity,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { ThemedText } from "@/components/ThemedText";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "@/lib/auth-context";
 import { useTheme } from "@/lib/theme-context";
@@ -74,7 +74,7 @@ export default function HomeScreen() {
             <View style={styles.profileHeaderRow}>
               <ProfilePhoto userId={user.id} />
               <View style={styles.profileInfo}>
-                <Text style={[styles.profileLabel, { color: colors.textMuted }]}>Profile</Text>
+                <ThemedText style={[styles.profileLabel, { color: colors.textMuted }]}>Profile</ThemedText>
                 <ProfileName
                   userId={user.id}
                   profileSetupOpen={profileSetupOpen}
@@ -91,12 +91,12 @@ export default function HomeScreen() {
               onPress={() => setProfileSetupOpen(true)}
               activeOpacity={0.7}
             >
-              <Text style={[styles.profileSetupBtnText, { color: colors.text }]}>Profile Setup</Text>
+              <ThemedText style={[styles.profileSetupBtnText, { color: colors.text }]}>Profile Setup</ThemedText>
             </TouchableOpacity>
           </View>
 
           <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Your Snippets</Text>
+            <ThemedText style={[styles.sectionTitle, { color: colors.text }]}>Your Snippets</ThemedText>
             <View style={styles.snippetsSwiperWrapper}>
               <LyricSnippets key={`snippets-${refreshKey}`} />
             </View>

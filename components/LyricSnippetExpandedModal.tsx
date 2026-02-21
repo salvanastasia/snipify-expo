@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import {
   View,
-  Text,
   Modal,
   TouchableWithoutFeedback,
   ScrollView,
@@ -12,6 +11,7 @@ import {
   Easing,
 } from "react-native";
 import { BlurView } from "expo-blur";
+import { ThemedText } from "./ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { LyricSnippet } from "@/lib/storage";
@@ -111,23 +111,23 @@ export function LyricSnippetExpandedModal({
                 contentContainerStyle={styles.lyricsContent}
                 showsVerticalScrollIndicator={false}
               >
-                <Text style={styles.lyrics}>{snippet.lyrics}</Text>
+                <ThemedText style={styles.lyrics}>{snippet.lyrics}</ThemedText>
               </ScrollView>
               <View style={styles.footer}>
                 {snippet.album_art_url ? (
                   <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
                 ) : (
                   <View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-                    <Ionicons name="musical-notes" size={24} color="rgba(255,255,255,0.4)" />
+                    <Ionicons name="musical-notes" size={18} color="rgba(255,255,255,0.4)" />
                   </View>
                 )}
                 <View style={styles.songInfo}>
-                  <Text style={styles.songTitle} numberOfLines={1}>
+                  <ThemedText style={styles.songTitle} numberOfLines={1}>
                     {snippet.song_title}
-                  </Text>
-                  <Text style={styles.artistName} numberOfLines={1}>
+                  </ThemedText>
+                  <ThemedText style={styles.artistName} numberOfLines={1}>
                     {snippet.artist_name}
-                  </Text>
+                  </ThemedText>
                 </View>
               </View>
             </View>
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
   lyrics: {
     color: "rgba(255,255,255,0.95)",
     fontSize: 18,
-    fontWeight: "500",
+    fontWeight: "700",
     lineHeight: 28,
   },
   footer: {
@@ -184,9 +184,9 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   albumArt: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 40,
+    height: 40,
+    borderRadius: 10,
     backgroundColor: "rgba(0,0,0,0.2)",
   },
   albumArtPlaceholder: {
