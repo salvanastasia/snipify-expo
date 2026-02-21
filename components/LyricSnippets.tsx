@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   ScrollView,
-  ActivityIndicator,
   StyleSheet,
   Dimensions,
   NativeSyntheticEvent,
@@ -102,9 +101,30 @@ export function LyricSnippets() {
   };
 
   if (loading) {
+    const isCream = colors.background === "#F2EDE7";
+    const skeletonBg = isCream ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)";
+    const skeletonLineBg = isCream ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.08)";
     return (
-      <View style={styles.centered}>
-        <ActivityIndicator color={colors.tint} />
+      <View style={styles.skeletonPage}>
+        <View style={styles.pageInner}>
+          {[1, 2, 3].map((i) => (
+            <View key={i} style={[styles.skeletonCard, { backgroundColor: skeletonBg }]}>
+              <View style={styles.skeletonCardContent}>
+                <View style={[styles.skeletonLine, { width: "100%", backgroundColor: skeletonLineBg }]} />
+                <View style={[styles.skeletonLine, { width: "92%", marginTop: 8, backgroundColor: skeletonLineBg }]} />
+                <View style={[styles.skeletonLine, { width: "78%", marginTop: 8, backgroundColor: skeletonLineBg }]} />
+                <View style={[styles.skeletonLine, { width: "85%", marginTop: 8, backgroundColor: skeletonLineBg }]} />
+                <View style={styles.skeletonFooter}>
+                  <View style={[styles.skeletonAlbumArt, { backgroundColor: skeletonLineBg }]} />
+                  <View style={styles.skeletonSongInfo}>
+                    <View style={[styles.skeletonLine, { width: 80, height: 14, backgroundColor: skeletonLineBg }]} />
+                    <View style={[styles.skeletonLine, { width: 56, height: 12, marginTop: 6, backgroundColor: skeletonLineBg }]} />
+                  </View>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
       </View>
     );
   }
@@ -184,7 +204,34 @@ export function LyricSnippets() {
 }
 
 const styles = StyleSheet.create({
-  centered: { padding: 24, alignItems: "center" },
+  skeletonPage: { paddingVertical: 4 },
+  skeletonCard: {
+    borderRadius: 30,
+    marginBottom: 12,
+    minHeight: 180,
+    overflow: "hidden",
+  },
+  skeletonCardContent: {
+    padding: 16,
+    flex: 1,
+  },
+  skeletonLine: {
+    height: 16,
+    borderRadius: 6,
+  },
+  skeletonFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginTop: 24,
+    paddingRight: 36,
+  },
+  skeletonAlbumArt: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+  },
+  skeletonSongInfo: { flex: 1 },
   errorText: { color: "#ff4444", fontSize: 14 },
   emptyText: { fontSize: 15 },
   swiper: { flexGrow: 0 },
