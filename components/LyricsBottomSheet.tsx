@@ -153,9 +153,17 @@ export function LyricsBottomSheet({ isOpen, onClose, song, onSave, initialLyrics
 
         {/* Lyrics */}
         {loading ? (
-          <View style={styles.centered}>
-            <ActivityIndicator color="#fff" size="large" />
-          </View>
+          <ScrollView
+            style={styles.lyricsScroll}
+            contentContainerStyle={styles.lyricsContent}
+            showsVerticalScrollIndicator={false}
+          >
+            {[100, 92, 88, 95, 78, 85, 70, 90, 65, 82].map((widthPct, index) => (
+              <View key={index} style={styles.skeletonLine}>
+                <View style={[styles.skeletonBar, { width: `${widthPct}%` }]} />
+              </View>
+            ))}
+          </ScrollView>
         ) : error ? (
           <View style={styles.centered}>
             <ThemedText style={styles.errorText}>{error}</ThemedText>
@@ -236,6 +244,16 @@ const styles = StyleSheet.create({
   },
   lyricsScroll: { flex: 1 },
   lyricsContent: { paddingHorizontal: 20, paddingVertical: 20 },
+  skeletonLine: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    marginBottom: 2,
+  },
+  skeletonBar: {
+    height: 18,
+    borderRadius: 6,
+    backgroundColor: "rgba(255,255,255,0.1)",
+  },
   lyricLine: {
     paddingVertical: 8,
     paddingHorizontal: 12,

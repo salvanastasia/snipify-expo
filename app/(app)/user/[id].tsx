@@ -279,9 +279,9 @@ const styles = StyleSheet.create({
   },
   ghostCardLyrics: { flex: 1 },
   ghostAlbumArt: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 38,
+    height: 38,
+    borderRadius: 10,
     backgroundColor: "rgba(255,255,255,0.08)",
   },
   ghostCardFooter: { marginTop: 12 },

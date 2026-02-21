@@ -34,9 +34,10 @@ interface Props {
   userId: string;
   profileSetupOpen: boolean;
   onProfileSetupClose: () => void;
+  onProfileSaved?: () => void;
 }
 
-export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: Props) {
+export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose, onProfileSaved }: Props) {
   const { signOut } = useAuth();
   const { theme, colors, setTheme, font, setFont, defaultFontFamily } = useTheme();
   const insets = useSafeAreaInsets();
@@ -84,6 +85,7 @@ export function ProfileName({ userId, profileSetupOpen, onProfileSetupClose }: P
         .eq("id", userId);
       if (error) throw error;
       setName(draft.trim());
+      onProfileSaved?.();
       onProfileSetupClose();
     } catch {
       Alert.alert("Error", "Failed to update name.");

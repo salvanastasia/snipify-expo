@@ -78,10 +78,8 @@ export default function HomeScreen() {
                 <ProfileName
                   userId={user.id}
                   profileSetupOpen={profileSetupOpen}
-                  onProfileSetupClose={() => {
-                  setProfileSetupOpen(false);
-                  setRefreshKey((k) => k + 1);
-                }}
+                  onProfileSetupClose={() => setProfileSetupOpen(false)}
+                  onProfileSaved={() => setRefreshKey((k) => k + 1)}
                 />
                 <ProfileStats userId={user.id} />
               </View>
