@@ -4,7 +4,8 @@ import {
   Image,
   TouchableOpacity,
   StyleSheet,
-  Alert,
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemedText } from "./ThemedText";
@@ -23,12 +24,13 @@ interface Props {
 
 export function SnippetCard({ snippet, readOnly = false, onDelete, isLast }: Props) {
   const [lyricsOpen, setLyricsOpen] = useState(false);
-  const { theme } = useTheme();
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const { theme, colors: themeColors } = useTheme();
 
   // Parse color from stored value (lighter|darker from album art)
-  const colors = snippet.color?.split("|") || ["#8B8E98", "#6B6E78"];
-  const bgColor = colors[0] || "#8B8E98";
-  const bgColorDark = colors[1] || "#6B6E78";
+  const colorPair = snippet.color?.split("|") || ["#8B8E98", "#6B6E78"];
+  const bgColor = colorPair[0] || "#8B8E98";
+  const bgColorDark = colorPair[1] || "#6B6E78";
   const isFlat = theme === "flat";
   const flatBg = isFlat ? lightenHexByBlendingWithWhite(bgColor) : null;
   const flatText = isFlat ? darkenHexForContrast(bgColorDark) : null;
@@ -37,16 +39,12 @@ export function SnippetCard({ snippet, readOnly = false, onDelete, isLast }: Pro
   const iconColor = isFlat ? flatText! : "rgba(255,255,255,0.4)";
   const trashColor = isFlat ? flatText! : "rgba(255,255,255,0.6)";
 
-  const handleDelete = () => {
-    Alert.alert("Delete Snippet", "Are you sure you want to delete this snippet?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Delete",
-        style: "destructive",
-        onPress: () => onDelete?.(snippet.id),
-      },
-    ]);
+  const handleDeletePress = () => setDeleteConfirmOpen(true);
+  const handleDeleteConfirm = () => {
+    setDeleteConfirmOpen(false);
+    onDelete?.(snippet.id);
   };
+  const handleDeleteCancel = () => setDeleteConfirmOpen(false);
 
   return (
     <>
@@ -86,12 +84,48 @@ export function SnippetCard({ snippet, readOnly = false, onDelete, isLast }: Pro
           </View>
 
           {!readOnly && (
-            <TouchableOpacity onPress={handleDelete} style={styles.deleteButton} activeOpacity={0.7}>
+            <TouchableOpacity onPress={handleDeletePress} style={styles.deleteButton} activeOpacity={0.7}>
               <Ionicons name="trash-outline" size={18} color={trashColor} />
             </TouchableOpacity>
           )}
         </View>
       </TouchableOpacity>
+
+      <Modal
+        visible={deleteConfirmOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={handleDeleteCancel}
+      >
+        <TouchableWithoutFeedback onPress={handleDeleteCancel}>
+          <View style={styles.deleteOverlay}>
+            <TouchableWithoutFeedback onPress={() => {}}>
+              <View style={[styles.deleteDialog, { backgroundColor: themeColors.card }]} collapsable={false}>
+                <ThemedText style={[styles.deleteTitle, { color: themeColors.text }]}>Delete Snippet</ThemedText>
+                <ThemedText style={[styles.deleteMessage, { color: themeColors.textMuted }]}>
+                  Are you sure you want to delete this snippet?
+                </ThemedText>
+                <View style={styles.deleteActions}>
+                  <TouchableOpacity
+                    style={[styles.deleteButtonSecondary, { backgroundColor: themeColors.input }]}
+                    onPress={handleDeleteCancel}
+                    activeOpacity={0.7}
+                  >
+                    <ThemedText style={[styles.deleteButtonText, { color: themeColors.text }]}>Cancel</ThemedText>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.deleteButtonPrimary, { backgroundColor: "#E53935" }]}
+                    onPress={handleDeleteConfirm}
+                    activeOpacity={0.7}
+                  >
+                    <ThemedText style={styles.deleteButtonPrimaryText}>Delete</ThemedText>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
       <LyricsBottomSheet
         isOpen={lyricsOpen}
@@ -162,5 +196,55 @@ const styles = StyleSheet.create({
     right: 16,
     bottom: 16,
     padding: 4,
+  },
+  deleteOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  deleteDialog: {
+    width: "100%",
+    maxWidth: 340,
+    borderRadius: 20,
+    padding: 24,
+    gap: 16,
+  },
+  deleteTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  deleteMessage: {
+    fontSize: 16,
+    lineHeight: 22,
+  },
+  deleteActions: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 8,
+  },
+  deleteButtonSecondary: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deleteButtonPrimary: {
+    flex: 1,
+    height: 48,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deleteButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  deleteButtonPrimaryText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
