@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   Image,
-  Modal,
-  FlatList,
+  Animated,
+  Easing,
+  Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/ThemedText";
@@ -34,7 +35,62 @@ export default function UserProfileScreen() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersCount, setFollowersCount] = useState(0);
   const [artistsInCommon, setArtistsInCommon] = useState<{ name: string; imageUrl: string | null }[]>([]);
-  const [artistsInCommonModalOpen, setArtistsInCommonModalOpen] = useState(false);
+  const [artistsInCommonExpanded, setArtistsInCommonExpanded] = useState(false);
+  const [collapsedWidth, setCollapsedWidth] = useState<number | null>(null);
+  const expandHeight = useRef(new Animated.Value(0)).current;
+  const listOpacity = useRef(new Animated.Value(0)).current;
+
+  const COLLAPSED_H = 56;
+  const FLOATING_H_MARGIN = 48; // left 24 + right 24
+  const fullFloatingWidth = Dimensions.get("window").width - FLOATING_H_MARGIN;
+  const HEADER_H = 52;
+  const ROW_H = 68;
+  const expandedHeight = Math.min(
+    320,
+    HEADER_H + artistsInCommon.length * ROW_H
+  );
+
+  const EXPAND_EASING = Easing.bezier(0.33, 1, 0.68, 1);
+  const COLLAPSE_EASING = Easing.bezier(0.33, 0, 0.68, 0);
+
+  const expandArtistsInCommon = () => {
+    setArtistsInCommonExpanded(true);
+    listOpacity.setValue(0);
+    Animated.parallel([
+      Animated.timing(expandHeight, {
+        toValue: 1,
+        duration: 340,
+        easing: EXPAND_EASING,
+        useNativeDriver: false,
+      }),
+      Animated.sequence([
+        Animated.delay(80),
+        Animated.timing(listOpacity, {
+          toValue: 1,
+          duration: 280,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]),
+    ]).start();
+  };
+
+  const collapseArtistsInCommon = () => {
+    Animated.parallel([
+      Animated.timing(expandHeight, {
+        toValue: 0,
+        duration: 280,
+        easing: COLLAPSE_EASING,
+        useNativeDriver: false,
+      }),
+      Animated.timing(listOpacity, {
+        toValue: 0,
+        duration: 180,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+    ]).start(() => setArtistsInCommonExpanded(false));
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -189,7 +245,10 @@ export default function UserProfileScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.content,
-          !isOwnProfile && user && artistsInCommon.length > 0 && styles.contentWithFloatingBar,
+          !isOwnProfile &&
+            user &&
+            artistsInCommon.length > 0 &&
+            (artistsInCommonExpanded ? styles.contentWithFloatingBarExpanded : styles.contentWithFloatingBar),
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -243,97 +302,127 @@ export default function UserProfileScreen() {
         </View>
       </ScrollView>
 
-      {/* Artists in common - floating fixed at bottom center */}
+      {/* Artists in common - floating, expandable in place */}
       {!isOwnProfile && user && artistsInCommon.length > 0 && (
-        <TouchableOpacity
-          style={styles.artistsInCommonFloating}
-          onPress={() => setArtistsInCommonModalOpen(true)}
-          activeOpacity={0.7}
-        >
-          <View style={styles.artistsInCommonContainer}>
-            <View style={styles.artistsInCommon}>
-              <View style={styles.artistsInCommonAvatars}>
-                {artistsInCommon.slice(0, 3).map((artist, index) => (
-                  <View
-                    key={artist.name}
-                    style={[
-                      styles.artistAvatar,
-                      index > 0 && styles.artistAvatarOverlap,
-                    ]}
-                  >
-                    {artist.imageUrl ? (
-                      <Image
-                        source={{ uri: artist.imageUrl }}
-                        style={StyleSheet.absoluteFill}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <Ionicons name="musical-notes" size={14} color="rgba(255,255,255,0.5)" />
-                    )}
-                  </View>
-                ))}
-              </View>
-              <View style={styles.artistsInCommonText}>
-                <ThemedText style={styles.artistsInCommonCount}>
-                  {artistsInCommon.length} artist{artistsInCommon.length !== 1 ? "s" : ""} in common
-                </ThemedText>
-                <ThemedText style={styles.artistsInCommonNames} numberOfLines={2}>
-                  {artistsInCommon.length <= 2
-                    ? artistsInCommon.map((a) => a.name).join(", ")
-                    : `${artistsInCommon.slice(0, 2).map((a) => a.name).join(", ")} and ${artistsInCommon.length - 2} other${artistsInCommon.length - 2 !== 1 ? "s" : ""}`}
-                </ThemedText>
-              </View>
-            </View>
-          </View>
-        </TouchableOpacity>
-      )}
-
-      <Modal
-        visible={artistsInCommonModalOpen}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setArtistsInCommonModalOpen(false)}
-      >
-        <TouchableOpacity
-          style={styles.modalBackdrop}
-          activeOpacity={1}
-          onPress={() => setArtistsInCommonModalOpen(false)}
-        >
-          <View style={styles.modalCard} pointerEvents="auto">
-            <View style={styles.modalHeader}>
-              <ThemedText style={styles.modalTitle}>In common artists</ThemedText>
+        <View style={styles.artistsInCommonFloating} pointerEvents="box-none">
+          <Animated.View
+            onLayout={(e) => {
+              if (!artistsInCommonExpanded && e.nativeEvent.layout.width) {
+                setCollapsedWidth(e.nativeEvent.layout.width);
+              }
+            }}
+            style={[
+              styles.artistsInCommonContainer,
+              {
+                maxHeight: expandHeight.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [COLLAPSED_H, expandedHeight],
+                }),
+                overflow: "hidden",
+                alignSelf: "center",
+              },
+              !artistsInCommonExpanded && { paddingLeft: 12, paddingRight: 16 },
+              (collapsedWidth !== null || artistsInCommonExpanded) && {
+                width: expandHeight.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [collapsedWidth ?? 200, fullFloatingWidth],
+                }),
+              },
+            ]}
+          >
+            {!artistsInCommonExpanded ? (
               <TouchableOpacity
-                onPress={() => setArtistsInCommonModalOpen(false)}
-                hitSlop={12}
-                style={styles.modalClose}
+                onPress={expandArtistsInCommon}
+                activeOpacity={0.7}
+                style={styles.artistsInCommonSummaryTouchable}
               >
-                <Ionicons name="close" size={24} color="rgba(255,255,255,0.8)" />
-              </TouchableOpacity>
-            </View>
-            <FlatList
-              data={artistsInCommon}
-              keyExtractor={(item) => item.name}
-              contentContainerStyle={styles.modalList}
-              renderItem={({ item }) => (
-                <View style={styles.modalArtistRow}>
-                  <View style={styles.modalArtistAvatar}>
-                    {item.imageUrl ? (
-                      <Image
-                        source={{ uri: item.imageUrl }}
-                        style={StyleSheet.absoluteFill}
-                        resizeMode="cover"
-                      />
-                    ) : (
-                      <Ionicons name="musical-notes" size={20} color="rgba(255,255,255,0.5)" />
-                    )}
+                <View style={styles.artistsInCommon}>
+                  <View style={styles.artistsInCommonAvatars}>
+                    {artistsInCommon.slice(0, 3).map((artist, index) => (
+                      <View
+                        key={artist.name}
+                        style={[
+                          styles.artistAvatar,
+                          index > 0 && styles.artistAvatarOverlap,
+                        ]}
+                      >
+                        {artist.imageUrl ? (
+                          <Image
+                            source={{ uri: artist.imageUrl }}
+                            style={StyleSheet.absoluteFill}
+                            resizeMode="cover"
+                          />
+                        ) : (
+                          <Ionicons name="musical-notes" size={14} color="rgba(255,255,255,0.5)" />
+                        )}
+                      </View>
+                    ))}
                   </View>
-                  <ThemedText style={styles.modalArtistName}>{item.name}</ThemedText>
+                  <View style={styles.artistsInCommonText}>
+                    <ThemedText style={styles.artistsInCommonCount}>
+                      {artistsInCommon.length} artist{artistsInCommon.length !== 1 ? "s" : ""} in common
+                    </ThemedText>
+                    <ThemedText style={styles.artistsInCommonNames} numberOfLines={2}>
+                      {artistsInCommon.length <= 2
+                        ? artistsInCommon.map((a) => a.name).join(", ")
+                        : `${artistsInCommon.slice(0, 2).map((a) => a.name).join(", ")} and ${artistsInCommon.length - 2} other${artistsInCommon.length - 2 !== 1 ? "s" : ""}`}
+                    </ThemedText>
+                  </View>
                 </View>
-              )}
-            />
-          </View>
-        </TouchableOpacity>
-      </Modal>
+              </TouchableOpacity>
+            ) : (
+              <Animated.View
+                style={{
+                  opacity: expandHeight.interpolate({
+                    inputRange: [0, 0.4, 1],
+                    outputRange: [0, 0.5, 1],
+                  }),
+                }}
+              >
+                <View style={styles.artistsInCommonExpandedHeader}>
+                  <ThemedText style={styles.modalTitle}>In common artists</ThemedText>
+                  <TouchableOpacity
+                    onPress={collapseArtistsInCommon}
+                    hitSlop={12}
+                    style={styles.modalClose}
+                  >
+                    <Ionicons name="chevron-down" size={24} color="rgba(255,255,255,0.8)" />
+                  </TouchableOpacity>
+                </View>
+                <Animated.View
+                  style={{
+                    height: expandedHeight - HEADER_H,
+                    opacity: listOpacity,
+                  }}
+                >
+                  <ScrollView
+                    style={styles.artistsInCommonListScroll}
+                    contentContainerStyle={styles.modalList}
+                    showsVerticalScrollIndicator={false}
+                  >
+                    {artistsInCommon.map((item) => (
+                      <View key={item.name} style={styles.modalArtistRow}>
+                        <View style={styles.modalArtistAvatar}>
+                          {item.imageUrl ? (
+                            <Image
+                              source={{ uri: item.imageUrl }}
+                              style={StyleSheet.absoluteFill}
+                              resizeMode="cover"
+                            />
+                          ) : (
+                            <Ionicons name="musical-notes" size={20} color="rgba(255,255,255,0.5)" />
+                          )}
+                        </View>
+                        <ThemedText style={styles.modalArtistName}>{item.name}</ThemedText>
+                      </View>
+                    ))}
+                  </ScrollView>
+                </Animated.View>
+              </Animated.View>
+            )}
+          </Animated.View>
+        </View>
+      )}
     </SafeAreaView>
   );
 }
@@ -346,6 +435,7 @@ const styles = StyleSheet.create({
   },
   content: { paddingHorizontal: 24, paddingBottom: 40 },
   contentWithFloatingBar: { paddingBottom: 100 },
+  contentWithFloatingBarExpanded: { paddingBottom: 360 },
   artistsInCommonFloating: {
     position: "absolute",
     bottom: 42,
@@ -361,6 +451,21 @@ const styles = StyleSheet.create({
     borderColor: "#383838",
     paddingVertical: 8,
     paddingHorizontal: 12,
+  },
+  artistsInCommonSummaryTouchable: {
+    paddingVertical: 4,
+  },
+  artistsInCommonExpandedHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 12,
+    paddingHorizontal: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.1)",
+  },
+  artistsInCommonListScroll: {
+    maxHeight: 256,
   },
   artistsInCommon: {
     flexDirection: "row",
@@ -397,29 +502,6 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.6)",
     fontSize: 13,
     marginTop: 2,
-  },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  modalCard: {
-    width: "100%",
-    maxWidth: 400,
-    maxHeight: "80%",
-    backgroundColor: "#282828",
-    borderRadius: 20,
-    overflow: "hidden",
-  },
-  modalHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(255,255,255,0.1)",
   },
   modalTitle: {
     color: "#fff",
