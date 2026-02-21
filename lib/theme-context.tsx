@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const THEME_STORAGE_KEY = "app_theme";
 const FONT_STORAGE_KEY = "profile_font";
 
-export type ThemeId = "default" | "cream";
+export type ThemeId = "default" | "cream" | "flat";
 export type FontId = "default" | "Doto";
 
 export type ThemeColors = {
@@ -41,12 +41,23 @@ const THEMES: Record<ThemeId, ThemeColors> = {
     statusBar: "dark",
     tint: "#3D2C2C",
   },
+  flat: {
+    background: "#121212",
+    text: "#fff",
+    textMuted: "rgba(255,255,255,0.6)",
+    card: "#282828",
+    input: "#383838",
+    border: "rgba(255,255,255,0.3)",
+    statusBar: "light",
+    tint: "#fff",
+  },
 };
 
 /** Swatch preview color for theme picker (circle background) */
 export const THEME_SWATCH_COLORS: Record<ThemeId, string> = {
   default: "#121212",
   cream: "#F2EDE7",
+  flat: "#5C5C5C",
 };
 
 type ThemeContextType = {
@@ -67,7 +78,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     AsyncStorage.getItem(THEME_STORAGE_KEY).then((stored) => {
-      if (stored === "cream" || stored === "default") setThemeState(stored);
+      if (stored === "cream" || stored === "default" || stored === "flat") setThemeState(stored);
     });
   }, []);
 

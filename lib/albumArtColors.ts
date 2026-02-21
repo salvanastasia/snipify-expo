@@ -7,6 +7,34 @@ const DEFAULT_DARK = "#6B6E78";
 
 export type ColorPair = `${string}|${string}`;
 
+/**
+ * Darkens a hex color by blending with black. Use for accessible text on light (flat) backgrounds.
+ * @param hex - e.g. "#CF9CD1"
+ * @param amount - 0 = no change, 1 = black. Use ~0.5–0.65 for readable text on light bg.
+ */
+export function darkenHexForContrast(hex: string, amount: number = 0.55): string {
+  const match = hex.replace(/^#/, "").match(/(..)(..)(..)/);
+  if (!match) return "#1a1a1a";
+  const r = Math.round(parseInt(match[1], 16) * (1 - amount));
+  const g = Math.round(parseInt(match[2], 16) * (1 - amount));
+  const b = Math.round(parseInt(match[3], 16) * (1 - amount));
+  return `#${[r, g, b].map((x) => Math.max(0, Math.min(255, x)).toString(16).padStart(2, "0")).join("")}`;
+}
+
+/**
+ * Lightens a hex color by blending with white. Use for flat snippet card backgrounds.
+ * @param hex - e.g. "#A67C3B"
+ * @param amount - 0 = no change, 1 = white. Use ~0.3–0.5 for a soft pastel background.
+ */
+export function lightenHexByBlendingWithWhite(hex: string, amount: number = 0.4): string {
+  const match = hex.replace(/^#/, "").match(/(..)(..)(..)/);
+  if (!match) return "#f5f5f5";
+  const r = Math.round(parseInt(match[1], 16) + (255 - parseInt(match[1], 16)) * amount);
+  const g = Math.round(parseInt(match[2], 16) + (255 - parseInt(match[2], 16)) * amount);
+  const b = Math.round(parseInt(match[3], 16) + (255 - parseInt(match[3], 16)) * amount);
+  return `#${[r, g, b].map((x) => Math.max(0, Math.min(255, x)).toString(16).padStart(2, "0")).join("")}`;
+}
+
 // Lazy load the module to avoid errors if it's not available
 let imageColorsModule: any = null;
 let moduleChecked = false;

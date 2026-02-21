@@ -15,6 +15,8 @@ import { ThemedText } from "./ThemedText";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { LyricSnippet } from "@/lib/storage";
+import { useTheme } from "@/lib/theme-context";
+import { darkenHexForContrast, lightenHexByBlendingWithWhite } from "@/lib/albumArtColors";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const CARD_MARGIN = 24;
@@ -73,6 +75,13 @@ export function LyricSnippetExpandedModal({
   const colors = snippet.color?.split("|") || ["#8B8E98", "#6B6E78"];
   const bgColor = colors[0] || "#8B8E98";
   const bgColorDark = colors[1] || "#6B6E78";
+  const { theme } = useTheme();
+  const isFlat = theme === "flat";
+  const flatBg = isFlat ? lightenHexByBlendingWithWhite(bgColor) : null;
+  const flatText = isFlat ? darkenHexForContrast(bgColorDark) : null;
+  const textColor = isFlat ? flatText! : "rgba(255,255,255,0.95)";
+  const artistColor = isFlat ? flatText! : "rgba(255,255,255,0.6)";
+  const iconColor = isFlat ? flatText! : "rgba(255,255,255,0.4)";
 
   return (
     <Modal
@@ -99,33 +108,37 @@ export function LyricSnippetExpandedModal({
             ]}
             pointerEvents="auto"
           >
-            <LinearGradient
-              colors={[bgColor, bgColorDark]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={styles.gradient}
-            />
+            {isFlat ? (
+              <View style={[styles.gradient, { backgroundColor: flatBg! }]} />
+            ) : (
+              <LinearGradient
+                colors={[bgColor, bgColorDark]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={styles.gradient}
+              />
+            )}
             <View style={styles.cardContent}>
               <ScrollView
                 style={styles.lyricsScroll}
                 contentContainerStyle={styles.lyricsContent}
                 showsVerticalScrollIndicator={false}
               >
-                <ThemedText style={styles.lyrics}>{snippet.lyrics}</ThemedText>
+                <ThemedText style={[styles.lyrics, { color: textColor }]}>{snippet.lyrics}</ThemedText>
               </ScrollView>
               <View style={styles.footer}>
                 {snippet.album_art_url ? (
                   <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
                 ) : (
                   <View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-                    <Ionicons name="musical-notes" size={18} color="rgba(255,255,255,0.4)" />
+                    <Ionicons name="musical-notes" size={18} color={iconColor} />
                   </View>
                 )}
                 <View style={styles.songInfo}>
-                  <ThemedText style={styles.songTitle} numberOfLines={1}>
+                  <ThemedText style={[styles.songTitle, { color: textColor }]} numberOfLines={1}>
                     {snippet.song_title}
                   </ThemedText>
-                  <ThemedText style={styles.artistName} numberOfLines={1}>
+                  <ThemedText style={[styles.artistName, { color: artistColor }]} numberOfLines={1}>
                     {snippet.artist_name}
                   </ThemedText>
                 </View>
@@ -172,7 +185,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   lyrics: {
-    color: "rgba(255,255,255,0.95)",
     fontSize: 18,
     fontWeight: "700",
     lineHeight: 28,
@@ -199,12 +211,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   songTitle: {
-    color: "rgba(255,255,255,0.9)",
     fontSize: 16,
     fontWeight: "600",
   },
   artistName: {
-    color: "rgba(255,255,255,0.6)",
     fontSize: 14,
     marginTop: 2,
   },

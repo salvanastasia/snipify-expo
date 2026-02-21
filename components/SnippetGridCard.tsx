@@ -11,6 +11,8 @@ import { ThemedText } from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { LyricSnippet } from "@/lib/storage";
 import { LyricSnippetExpandedModal } from "./LyricSnippetExpandedModal";
+import { useTheme } from "@/lib/theme-context";
+import { darkenHexForContrast, lightenHexByBlendingWithWhite } from "@/lib/albumArtColors";
 
 const CARD_GAP = 12;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -27,10 +29,18 @@ interface Props {
 
 export function SnippetGridCard({ snippet, readOnly = false }: Props) {
   const [lyricsOpen, setLyricsOpen] = useState(false);
+  const { theme } = useTheme();
 
   const colors = snippet.color?.split("|") || ["#8B8E98", "#6B6E78"];
   const bgColor = colors[0] || "#8B8E98";
   const bgColorDark = colors[1] || "#6B6E78";
+  const isFlat = theme === "flat";
+  const flatBg = isFlat ? lightenHexByBlendingWithWhite(bgColor) : null;
+  const flatText = isFlat ? darkenHexForContrast(bgColorDark) : null;
+  const textColor = isFlat ? flatText! : "rgba(255,255,255,0.9)";
+  const artistColor = isFlat ? flatText! : "rgba(255,255,255,0.6)";
+  const iconColor = isFlat ? flatText! : "rgba(255,255,255,0.4)";
+  const placeholderColor = isFlat ? (flatText! + "40") : "rgba(255,255,255,0.25)";
 
   return (
     <>
@@ -41,33 +51,37 @@ export function SnippetGridCard({ snippet, readOnly = false }: Props) {
           onPress={() => setLyricsOpen(true)}
           activeOpacity={0.9}
         >
-          <LinearGradient
-            colors={[bgColor, bgColorDark]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
+          {isFlat ? (
+            <View style={[StyleSheet.absoluteFill, { backgroundColor: flatBg! }]} />
+          ) : (
+            <LinearGradient
+              colors={[bgColor, bgColorDark]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={StyleSheet.absoluteFill}
+            />
+          )}
           <View style={styles.cardContent}>
             <View style={styles.lyricsPlaceholder}>
-              <View style={styles.placeholderLine} />
-              <View style={[styles.placeholderLine, styles.placeholderLineShort]} />
-              <View style={[styles.placeholderLine, styles.placeholderLineShorter]} />
+              <View style={[styles.placeholderLine, { backgroundColor: placeholderColor }]} />
+              <View style={[styles.placeholderLine, styles.placeholderLineShort, { backgroundColor: placeholderColor }]} />
+              <View style={[styles.placeholderLine, styles.placeholderLineShorter, { backgroundColor: placeholderColor }]} />
             </View>
             <View style={styles.footer}>
             {snippet.album_art_url ? (
               <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
             ) : (
               <View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-                <Ionicons name="musical-notes" size={12} color="rgba(255,255,255,0.4)" />
+                <Ionicons name="musical-notes" size={12} color={iconColor} />
               </View>
             )}
             <View style={styles.songInfo}>
-              <ThemedText style={styles.songTitle} numberOfLines={1}>
+              <ThemedText style={[styles.songTitle, { color: textColor }]} numberOfLines={1}>
                 {snippet.song_title}
               </ThemedText>
-              <ThemedText style={styles.artistName} numberOfLines={1}>
+              <ThemedText style={[styles.artistName, { color: artistColor }]} numberOfLines={1}>
                 {snippet.artist_name}
-</ThemedText>
+              </ThemedText>
           </View>
           </View>
         </View>

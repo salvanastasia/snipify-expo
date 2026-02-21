@@ -11,6 +11,8 @@ import { ThemedText } from "./ThemedText";
 import { Ionicons } from "@expo/vector-icons";
 import { LyricSnippet } from "@/lib/storage";
 import { LyricsBottomSheet } from "./LyricsBottomSheet";
+import { useTheme } from "@/lib/theme-context";
+import { darkenHexForContrast, lightenHexByBlendingWithWhite } from "@/lib/albumArtColors";
 
 interface Props {
   snippet: LyricSnippet;
@@ -21,11 +23,19 @@ interface Props {
 
 export function SnippetCard({ snippet, readOnly = false, onDelete, isLast }: Props) {
   const [lyricsOpen, setLyricsOpen] = useState(false);
+  const { theme } = useTheme();
 
-  // Parse color from stored value
+  // Parse color from stored value (lighter|darker from album art)
   const colors = snippet.color?.split("|") || ["#8B8E98", "#6B6E78"];
   const bgColor = colors[0] || "#8B8E98";
   const bgColorDark = colors[1] || "#6B6E78";
+  const isFlat = theme === "flat";
+  const flatBg = isFlat ? lightenHexByBlendingWithWhite(bgColor) : null;
+  const flatText = isFlat ? darkenHexForContrast(bgColorDark) : null;
+  const textColor = isFlat ? flatText! : "rgba(255,255,255,0.95)";
+  const artistColor = isFlat ? flatText! : "rgba(255,255,255,0.6)";
+  const iconColor = isFlat ? flatText! : "rgba(255,255,255,0.4)";
+  const trashColor = isFlat ? flatText! : "rgba(255,255,255,0.6)";
 
   const handleDelete = () => {
     Alert.alert("Delete Snippet", "Are you sure you want to delete this snippet?", [
@@ -45,39 +55,39 @@ export function SnippetCard({ snippet, readOnly = false, onDelete, isLast }: Pro
         onPress={() => setLyricsOpen(true)}
         activeOpacity={0.9}
       >
-        {/* Linear gradient background */}
-        <LinearGradient
-          colors={[bgColor, bgColorDark]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={StyleSheet.absoluteFill}
-        />
+        {isFlat ? (
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: flatBg! }]} />
+        ) : (
+          <LinearGradient
+            colors={[bgColor, bgColorDark]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
+        )}
 
         <View style={styles.cardContent}>
-          {/* Top: lyrics only */}
-          <ThemedText style={styles.lyrics} numberOfLines={4}>
+          <ThemedText style={[styles.lyrics, { color: textColor }]} numberOfLines={4}>
             {snippet.lyrics}
           </ThemedText>
 
-          {/* Bottom: album art (left) + song/artist (middle) */}
           <View style={styles.footer}>
             {snippet.album_art_url ? (
               <Image source={{ uri: snippet.album_art_url }} style={styles.albumArt} />
             ) : (
               <View style={[styles.albumArt, styles.albumArtPlaceholder]}>
-                <Ionicons name="musical-notes" size={16} color="rgba(255,255,255,0.4)" />
+                <Ionicons name="musical-notes" size={16} color={iconColor} />
               </View>
             )}
             <View style={styles.songInfo}>
-              <ThemedText style={styles.songTitle} numberOfLines={1}>{snippet.song_title}</ThemedText>
-              <ThemedText style={styles.artistName} numberOfLines={1}>{snippet.artist_name}</ThemedText>
+              <ThemedText style={[styles.songTitle, { color: textColor }]} numberOfLines={1}>{snippet.song_title}</ThemedText>
+              <ThemedText style={[styles.artistName, { color: artistColor }]} numberOfLines={1}>{snippet.artist_name}</ThemedText>
             </View>
           </View>
 
-          {/* Trash icon: bottom right, respecting padding */}
           {!readOnly && (
             <TouchableOpacity onPress={handleDelete} style={styles.deleteButton} activeOpacity={0.7}>
-              <Ionicons name="trash-outline" size={18} color="rgba(255,255,255,0.6)" />
+              <Ionicons name="trash-outline" size={18} color={trashColor} />
             </TouchableOpacity>
           )}
         </View>
@@ -114,7 +124,6 @@ const styles = StyleSheet.create({
   },
   lyrics: {
     flex: 1,
-    color: "rgba(255,255,255,0.95)",
     fontSize: 18,
     fontWeight: "700",
     lineHeight: 28,
@@ -141,12 +150,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   songTitle: {
-    color: "rgba(255,255,255,0.9)",
     fontSize: 15,
     fontWeight: "600",
   },
   artistName: {
-    color: "rgba(255,255,255,0.6)",
     fontSize: 13,
     marginTop: 2,
   },

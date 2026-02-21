@@ -28,6 +28,7 @@ export type SnippetsLayoutId = "list" | "grid";
 const THEME_OPTIONS: { id: ThemeId; label: string }[] = [
   { id: "default", label: "Default theme" },
   { id: "cream", label: "Cream theme" },
+  { id: "flat", label: "Flat snippets" },
 ];
 
 interface Props {
